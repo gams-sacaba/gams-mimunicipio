@@ -1,0 +1,245 @@
+/* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.example-full-width {
+  width: 100%;
+}
+
+[data-l-id] path {
+  stroke-width: 3px;
+  stroke: #2b2d42;
+}
+
+[data-n-id] rect {
+  fill: #dde2cd;
+}
+
+[data-n-id] rect:hover {
+  filter: drop-shadow(4px 5px 5px #aeaeae);
+}
+
+.field_0 {
+  font-family: Cambria;
+  font-family: Impact;
+  text-transform: uppercase;
+  fill: #000000;
+  text-anchor: middle;
+}
+
+.field_1 {
+  font-family: Arial;
+  text-transform: uppercase;
+  fill: #0c0a0a;
+  text-anchor: middle;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.node.no-user rect {
+  fill: #000000;
+}
+
+.node.no-user text {
+  fill: rgb(51, 41, 41);
+}
+
+.node.item rect {
+  fill: #dde2cd;
+}
+.node.eventual rect {
+  fill: #93cddd;
+}
+.node.ascenso rect {
+  fill: #b7fd71;
+}
+.node.creacion rect {
+  fill: #799540;
+}
+.node.reubicacion rect {
+  fill: #ffff00;
+}
+.node.descenso rect {
+  fill: #f2dcda;
+}
+.node.eliminacion rect {
+  fill: #ff0000;
+}
+
+/*******************ORGANIGRAM*************************/
+.modal .panel {
+  margin-bottom: 0px;
+}
+
+.organigrama {
+  overflow: auto;
+  background: #ecf0f1;
+  padding: 50px;
+  max-height: 700px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.organigrama table {
+  width: 100%;
+}
+
+.organigrama table td {
+  text-align: center;
+  vertical-align: top;
+}
+
+.organigrama .nodo-header {
+  text-align: center;
+}
+/*Valores de cada caja o nodo*/
+.organigrama .nodo {
+  position: relative;
+  width: 120px;
+  height: 100px;
+  border-bottom: 5px solid #34495e;
+  background: #34495e;
+  color: #ecf0f1;
+  display: inline-block;
+  padding: 20px 10px;
+  margin: 0 10px;
+  cursor: pointer;
+}
+
+.organigrama .color-item {
+  background-color: red;
+}
+
+.organigrama .color-contract {
+  background-color: yellow;
+}
+
+/*Lineas inferiores td */
+.organigrama table td .line-down {
+  width: 2px;
+  height: 25px;
+  display: inline-block;
+}
+
+.organigrama .line {
+  width: 10%;
+  /* border-width: 2px; */
+}
+
+/*resolv*/
+.organigrama .line.up {
+  border-top: 2px solid #34495e !important;
+}
+
+.organigrama .line.right {
+  border-right: 2px solid #34495e !important;
+}
+
+/*aumenta ancho en todos*/
+.organigrama .line.left {
+  border-left: 2px solid #34495e !important;
+}
+
+/*resolv*/
+.organigrama .nodo.collapsed {
+  border-bottom-color: #d35400;
+}
+
+.organigrama .nodo .controls {
+  display: none;
+  position: absolute;
+  top: 0;
+  right: -56px;
+  background: #ecf0f1;
+  z-index: 2;
+  padding: 6px 10px 6px 6px;
+}
+
+.organigrama .nodo:hover .controls {
+  display: block;
+}
+
+/**/
+.organigrama .nodo .btn-collapse {
+  position: absolute;
+  display: inline-block;
+  color: #e74c3c;
+  top: 100%;
+  left: 50%;
+  margin-top: 5px;
+  margin-left: -9px;
+  font-size: 18px;
+  background: #ecf0f1;
+}
+
+.nodo-child.hidden {
+  display: none;
+}
+
+.organigrama .nodo .badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #2c3e50;
+  background: #ecf0f1;
+}
+
+.organigrama .nodo .nodo-nombre {
+  font-style: italic;
+  color: #bdc3c7;
+}
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.load {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  transition: 200ms;
+  color: white;
+}
+
+.load:hover {
+  color: rgb(44, 253, 243);
+  letter-spacing: 0.5px;
+  box-shadow: inset;
+}
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

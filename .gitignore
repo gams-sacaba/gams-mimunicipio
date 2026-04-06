@@ -1,0 +1,12 @@
+# Ignore .vscode configurations
+.vscode/
+server/.vscode/
+client/.vscode/
+
+# Ignore node_modules in any directory
+**/node_modules/
+
+# Ignore Angular build output
+client/.angular/
+client/dist/
+client/build/

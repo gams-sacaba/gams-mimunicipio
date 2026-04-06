@@ -1,0 +1,87 @@
+/* Estilo general para el contenedor */
+.user-profile-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 10px;
+}
+
+/* Estilo de los cards */
+.user-card {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+/* Estilo cuando el ratón pasa sobre el card */
+.user-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilo de los títulos de los cards */
+.mat-card-header {
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+/* Estilo de las etiquetas dentro de los campos */
+.mat-form-field {
+  width: 100%;
+}
+
+/* Colores de fondo para cada card */
+.user-card:nth-child(odd) {
+  background-color: #c2c2c2; /* Color suave verde para los cards impares */
+}
+
+.user-card:nth-child(even) {
+  background-color: #fffbfb; /* Color suave rosa para los cards pares */
+}
+
+/* Estilo de los checkboxes dentro de los cards */
+.mat-checkbox-label {
+  color: #333;
+  font-weight: normal;
+}
+
+.mat-checkbox-checked .mat-checkbox-background {
+  background-color: #4caf50; /* Verde para los checkboxes seleccionados */
+}
+
+.user-card-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; /* Espacio entre inputs */
+}
+
+.margin-input {
+  margin-right: 5px;
+  flex: 1 1 200px; /* Mínimo 200px, crece si hay espacio */
+  min-width: 150px;
+}
+
+.margin-input-little {
+  margin-right: 5px;
+  width: 70px;
+}
+
+.margin-input-middle {
+  margin-right: 5px;
+  width: 105px;
+}
+
+@media (max-width: 600px) {
+  .user-card:nth-child(odd),
+  .user-card:nth-child(even) {
+    padding: 20px;
+  }
+
+  .margin-input,
+  .margin-input-little,
+  .margin-input-middle {
+    width: 100%;
+  }
+}

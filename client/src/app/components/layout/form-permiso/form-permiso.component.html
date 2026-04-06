@@ -1,0 +1,104 @@
+<!-- Contenedor principal del formulario -->
+<div class="vacaciones-form mat-elevation-z8 p-4">
+    <!-- Título del formulario -->
+    <div class="text-center">
+        <h5>{{data.titulo}}</h5>
+    </div>
+
+    <!-- Selección de solicitud de permiso -->
+    <div class="row g-3">
+
+        <!-- Selección de fechas -->
+        <div class="col-md-6">
+
+            <button mat-raised-button color="primary" matSuffix (click)="toggleCalendario()" style="width: 190px;">
+                Seleccionar Fechas
+                <mat-icon>{{ mostrarCalendario ? 'expand_less' : 'expand_more' }}</mat-icon>
+            </button>
+
+            <!-- Calendario personalizado -->
+            <div *ngIf="mostrarCalendario" class="calendario-contenedor">
+                <mat-calendar [(selected)]="fechaSeleccionada"
+                    (selectedChange)="agregarFechaSeleccionada(fechaSeleccionada)">
+                </mat-calendar>
+            </div>
+        </div>
+
+        <div *ngIf="mensajeError" class="alert alert-danger mt-2">
+            {{ mensajeError }}
+        </div>
+
+    </div>
+
+    <!-- Lista de días generados -->
+    <div class="mt-1">
+        <div *ngIf="dias.length > 0">
+            <p class="text-center">Detalles de los días seleccionados</p>
+            <div class="container-date">
+                <div *ngFor="let dia of dias; let i = index" class="row g-3 align-items-center dia-item">
+                    <!-- Fecha -->
+                    <div class="col-md-4">
+                        <mat-form-field appearance="fill" class="w-100">
+                            <mat-label>Fecha</mat-label>
+                            <input matInput [value]="dia.fecha" readonly [disabled]="data?.solicitud" required />
+                        </mat-form-field>
+                    </div>
+
+                    <!-- Jornada -->
+                    <div class="col-md-4">
+                        <mat-form-field appearance="fill" class="w-100">
+                            <mat-label>Jornada</mat-label>
+                            <mat-select [(ngModel)]="dia.jornada" (selectionChange)="actualizarTurno(i)"
+                                [disabled]="data?.solicitud" required>
+                                <mat-option value="completa">Jornada Completa</mat-option>
+                                <mat-option value="media">Media Jornada</mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="!dia.jornada">La jornada es requerida</mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- Turno (solo para media jornada) -->
+                    <div class="col-md-3" *ngIf="dia.jornada === 'media'">
+                        <mat-form-field appearance="fill" class="w-100">
+                            <mat-label>Turno</mat-label>
+                            <mat-select [(ngModel)]="dia.turno" [disabled]="data?.solicitud" required>
+                                <mat-option value="mañana">Mañana</mat-option>
+                                <mat-option value="tarde">Tarde</mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="!dia.turno">El turno es requerido</mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- Botón para eliminar día -->
+                    <div class="col-md-1 text-end">
+                        <button mat-icon-button color="warn" (click)="eliminarDia(i)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Campo de detalle -->
+    <div class="form-group mt-4" style="text-align: center;">
+        <label for="detalleTextarea">Motivo</label>
+        <textarea id="detalleTextarea" class="form-control" [(ngModel)]="detalle" maxlength="150" minlength="5"
+            (input)="detalle = detalle.toUpperCase()" required>
+        </textarea>
+        <small class="form-text text-muted text-right">{{ detalle.length }}/150</small>
+        <small class="text-danger" *ngIf="detalle.length < 5">
+            Debe introducir al menos 5 caracteres.
+        </small>
+    </div>
+
+
+    <!-- Botones de acción -->
+    <div class="summary">
+        <button mat-raised-button color="primary" (click)="enviarSolicitud()" [disabled]="!formularioValido()"
+            class="send">
+            Enviar
+        </button>
+        <button mat-raised-button color="warn" mat-dialog-close class="send">Cancelar</button>
+    </div>
+</div>

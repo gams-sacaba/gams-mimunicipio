@@ -1,0 +1,43 @@
+<div class="p-lg-4 ayuda-container">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="section-title"><mat-icon>school</mat-icon> Centro de Capacitación GAMS</h2>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <mat-card class="manual-card">
+                <mat-card-content>
+                    <div class="manual-info">
+                        <mat-icon class="pdf-icon">insert_drive_file</mat-icon>
+                        <div>
+                            <h3>Manual de Usuario MiMunicipio 2026</h3>
+                            <p>Guía detallada en PDF sobre el uso de todos los módulos del sistema.</p>
+                        </div>
+                    </div>
+                    <button mat-raised-button color="accent" (click)="descargarManual()">
+                        <mat-icon>download</mat-icon> DESCARGAR MANUAL
+                    </button>
+                </mat-card-content>
+            </mat-card>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3" *ngFor="let video of tutoriales">
+            <mat-card class="video-card">
+                <div class="video-thumbnail" (click)="reproducirVideo(video)">
+                    <img [src]="video.thumbnail" [alt]="video.titulo">
+                    <div class="play-overlay">
+                        <mat-icon>play_circle_filled</mat-icon>
+                    </div>
+                </div>
+                <mat-card-content class="pt-2">
+                    <mat-card-title>{{ video.titulo }}</mat-card-title>
+                    <p class="text-muted">{{ video.descripcion }}</p>
+                </mat-card-content>
+            </mat-card>
+        </div>
+    </div>
+</div>

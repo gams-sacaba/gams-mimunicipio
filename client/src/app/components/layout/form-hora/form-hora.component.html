@@ -1,0 +1,109 @@
+<div class="hora-container mat-elevation-z2">
+    <div class="header">
+        <span class="titulo">
+            <mat-icon color="primary" class="icon-time">access_time</mat-icon>
+            <span>{{ data?.titulo || 'Excepción de Tickeo' }}</span>
+        </span>
+    </div>
+
+    <div class="form-content">
+        <span class="info-name" *ngIf="esAprobador">
+            <strong>
+                {{capitalizeFirst(solicitud?.id_registro?.id_funcionario?.nombre || '')}}
+                {{capitalizeFirst(solicitud?.id_registro?.id_funcionario?.paterno || '')}}
+                {{capitalizeFirst(solicitud?.id_registro?.id_funcionario?.materno || '')}}
+                {{capitalizeFirst(solicitud?.id_registro?.id_funcionario?.casada || '')}}
+            </strong>
+        </span>
+
+        <p class="info-text"
+            *ngIf="!esAprobador && data?.restricciones?.limite_dias != null && data?.restricciones.limite_dias < 365">
+            Solo puede seleccionar una fecha dentro de los últimos
+            <strong>{{ data?.restricciones?.max_dias_plazo || 0 }}</strong> días.
+        </p>
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Fecha de la excepción</mat-label>
+                <input matInput [matDatepicker]="picker" [(ngModel)]="fechaSalida"
+                    [matDatepickerFilter]="filtroFechasValidas" [min]="RangoMinFecha" [max]="RangoMaxFecha"
+                    [readonly]="true" [disabled]="esDetalle" placeholder="Selecciona la fecha" required />
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+        </div>
+
+        <div class="form-row" style="margin-top: -10px;">
+            <div class=" form-group">
+                <label for="horaInicio">Hora Inicio</label>
+                <input type="time" id="horaInicio" class="form-control" [(ngModel)]="horaInicio" [disabled]="esDetalle"
+                    (change)="validateHoraRango()" />
+            </div>
+
+            <div class="form-group">
+                <label for="horaFin">Hora Fin</label>
+                <input type="time" id="horaFin" class="form-control" [(ngModel)]="horaFin" [disabled]="esDetalle"
+                    (change)="validateHoraRango()" />
+            </div>
+        </div>
+
+        <mat-error *ngIf="horaRangoInvalido" class="error-text">
+            La hora de inicio no puede ser mayor o igual que la hora fin.
+        </mat-error>
+
+        <mat-error *ngIf="fechaSalida && fechaFueraDeRango()">
+            La fecha debe estar dentro de la gestión 2026.
+        </mat-error>
+        <div *ngIf="data?.detalle">
+            <mat-form-field appearance="outline" class="form-field mt-3" style="width: 100%;">
+                <mat-label>Motivo de la solicitud</mat-label>
+                <textarea matInput [(ngModel)]="motivo" maxlength="150" minlength="5"
+                    (input)="motivo = motivo.toUpperCase()" [disabled]="esDetalle"
+                    placeholder="Describe brevemente el motivo" required></textarea>
+                <mat-hint align="end">{{ motivo.length }}/150</mat-hint>
+                <mat-error *ngIf="motivo.length < 5">Debe tener al menos 5 caracteres.</mat-error>
+            </mat-form-field>
+        </div>
+    </div>
+
+    <div *ngIf="estado === 'RECHAZADO' || estado === 'DENEGADO' || (estado === 'REVISION' && esAprobador)">
+        <mat-form-field appearance="outline" class="form-field mt-3" style="width: 100%;">
+            <mat-label>Observación</mat-label>
+            <textarea matInput [(ngModel)]="observacion" name="observacion" maxlength="150" minlength="5"
+                (input)="observacion = observacion.toUpperCase()" placeholder="Describe brevemente el motivo"
+                [disabled]="(estado === 'RECHAZADO' || estado === 'DENEGADO') && !esAprobador" required></textarea>
+            <mat-hint align="end">{{ observacion.length }}/150</mat-hint>
+            <mat-error *ngIf="(estado === 'RECHAZADO' || estado === 'DENEGADO') && observacionInvalida()">
+                La observación es obligatoria cuando se deniega la solicitud.
+            </mat-error>
+            <mat-error *ngIf="observacion.length < 5">Debe tener al menos 5 caracteres.</mat-error>
+        </mat-form-field>
+    </div>
+
+    <div class="form-option" *ngIf="esAprobador">
+        <mat-radio-group class="form-option" aria-label="SELECCIONAR UNA OPCIÓN:" [(ngModel)]="estado" name="estado"
+            required>
+            <mat-radio-button [value]="estadoAprobador" tabindex="-1">APROBAR</mat-radio-button>
+            <mat-radio-button value="DENEGADO" tabindex="-1">DENEGAR</mat-radio-button>
+        </mat-radio-group>
+        <mat-error *ngIf="!estado">Debe seleccionar una opción de estado.</mat-error>
+    </div>
+
+    <div class="acciones">
+        <button mat-raised-button color="primary" (click)="enviarExcepcion()" [disabled]="
+            !fechaSalida ||
+            !horaInicio ||
+            !horaFin ||
+            !motivo ||
+            horaRangoInvalido ||
+            fechaFueraDeRango() ||
+            observacionInvalida()
+          " *ngIf="esVista">
+            {{this.esDetalle ? "Responder" : this.modoEdicion === true ? "Modificar": "Enviar"}} Solicitud
+        </button>
+
+        <button mat-raised-button color="warn" (click)="salir()">
+            {{this.esVista ? "Cancelar": "Cerrar"}}
+        </button>
+    </div>
+</div>

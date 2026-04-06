@@ -1,0 +1,128 @@
+<div class="calendar-container mat-elevation-z2">
+    <div class="header">
+        <span class="titulo-solicitud">
+            <mat-icon color="primary" class="icon-time">calendar_today</mat-icon>
+            <span>{{ data?.titulo || "Solicitud de Permiso" }}</span>
+        </span>
+
+        <div class="info-cards">
+            <span class="info-name" *ngIf="esAprobador">
+                <strong>
+                    {{capitalizeFirst(solicitudActual[0]?.id_registro?.id_funcionario?.nombre || '')}}
+                    {{capitalizeFirst(solicitudActual[0]?.id_registro?.id_funcionario?.paterno || '')}}
+                    {{capitalizeFirst(solicitudActual[0]?.id_registro?.id_funcionario?.materno || '')}}
+                    {{capitalizeFirst(solicitudActual[0]?.id_registro?.id_funcionario?.casada || '')}}
+                </strong>
+            </span>
+            <div class="info-text"
+                *ngIf="!esAprobador && data?.restricciones?.limite_dias != null && data?.restricciones.limite_dias < 365">
+                <mat-icon color="accent">schedule</mat-icon>
+                <span>Días máximos permitidos:</span>
+                <strong>{{ formatearDias(data?.restricciones.limite_dias) }}</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="month-navigation" *ngIf="esVista && !esAprobador">
+        <button mat-icon-button color="primary" (click)="mostrarMesAnterior()" [disabled]="mesActualIndex === 0"
+            tabindex="-1">
+            <mat-icon>chevron_left</mat-icon>
+        </button>
+
+        <span class="month-title" tabindex="-1">{{ mesActualNombre }} {{ anioGestion }}</span>
+
+        <button mat-icon-button color="primary" (click)="mostrarMesSiguiente()" [disabled]="mesActualIndex === 11"
+            tabindex="-1">
+            <mat-icon>chevron_right</mat-icon>
+        </button>
+    </div>
+
+    <div class="calendar" *ngIf="esVista  && !esAprobador">
+        <div class="days-grid">
+            <div *ngFor="let dia of diasSemana" class="day header">{{ dia }}</div>
+
+            <div *ngFor="let dia of getDiasDelMes(mesActualIndex)" class="day" [ngClass]="{
+              'selected-morning': esDiaSeleccionadoTurno(dia, 'mañana'),
+              'selected-afternoon': esDiaSeleccionadoTurno(dia, 'tarde'),
+              'selected-full': esDiaSeleccionado(dia) && !esDiaSeleccionadoTurno(dia, 'mañana') && !esDiaSeleccionadoTurno(dia, 'tarde'),
+              'disabled': esDiaNoPermitido(dia),
+              'blocked': esDiaPasado(dia),
+              'previous-month': esDiaDelMesAnterior(dia, mesActualIndex)
+            }" (click)="!esDetalle && seleccionarDia(dia, mesActualIndex)">
+                {{ dia.getDate() }}
+            </div>
+        </div>
+    </div>
+
+    <div class="resumen-dias-lista" *ngIf="diasSeleccionados.length > 0 && esDetalle">
+        <div class="resumen-header">
+            <mat-icon>event_note</mat-icon>
+            <span>Detalle de Fechas Solicitadas</span>
+        </div>
+
+        <div class="scroll-resumen custom-scrollbar">
+            <div class="dia-fila-simple" *ngFor="let item of diasSeleccionados">
+                <span class="fecha-info">{{ item.fecha | date: 'dd/MM/yyyy' }}</span>
+                <span class="jornada-info" [ngClass]="item.jornada">
+                    {{ item.jornada === 'completa' ? 'Día Completo' : 'Media (' + item.turno + ')' }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-cards resumen">
+        <div class="info-card">
+            <mat-icon color="warn">timer</mat-icon>
+            <span>Total días seleccionados:</span>
+            <strong>{{ formatearDias(data?.restricciones.limite_dias - diasDisponibles) }}</strong>
+        </div>
+    </div>
+
+    <div *ngIf="data?.detalle">
+        <mat-form-field appearance="outline" class="detalle-field">
+            <mat-label>Detalle de la solicitud</mat-label>
+            <textarea matInput [(ngModel)]="descripcion" rows="3" placeholder="Describe brevemente tu solicitud."
+                maxlength="150" minlength="5" (input)="descripcion = descripcion.toUpperCase()" [disabled]="esDetalle"
+                required></textarea>
+            <mat-hint align="start">{{ descripcion.length }}/150 caracteres</mat-hint>
+            <mat-error *ngIf="descripcion.length < 5">
+                La descripción debe tener al menos 5 caracteres.
+            </mat-error>
+        </mat-form-field>
+    </div>
+
+    <div *ngIf="estado === 'RECHAZADO'  || estado === 'DENEGADO'|| (estado === 'REVISION' && esAprobador)">
+        <mat-form-field appearance="outline" class="form-field mt-3" style="width: 100%;">
+            <mat-label>Observación</mat-label>
+            <textarea matInput [(ngModel)]="observacion" name="observacion" maxlength="150" minlength="5"
+                (input)="observacion = observacion.toUpperCase()" placeholder="Describe brevemente el motivo"
+                [disabled]="(estado === 'RECHAZADO' || estado === 'DENEGADO' ) && !esAprobador" required></textarea>
+            <mat-hint align="end">{{ observacion.length }}/150</mat-hint>
+            <mat-error *ngIf="(estado === 'RECHAZADO' || estado === 'DENEGADO') && observacionInvalida()">
+                La observación es obligatoria cuando se deniega la solicitud.
+            </mat-error>
+            <mat-error *ngIf="observacion.length < 5">Debe tener al menos 5 caracteres.</mat-error>
+        </mat-form-field>
+    </div>
+
+    <div class="form-option" *ngIf="esAprobador">
+        <mat-radio-group class="form-option" aria-label="SELECCIONAR UNA OPCIÓN:" [(ngModel)]="estado" name="estado"
+            required>
+            <mat-radio-button [value]="estadoAprobador" tabindex="-1">APROBAR</mat-radio-button>
+            <mat-radio-button value="DENEGADO" tabindex="-1">DENEGAR</mat-radio-button>
+        </mat-radio-group>
+        <mat-error *ngIf="!estado">Debe seleccionar una opción de estado.</mat-error>
+    </div>
+
+    <div class="summary-buttons">
+        <button mat-raised-button color="primary" (click)="enviarSolicitud()"
+            [disabled]="diasDisponibles === data.restricciones.limite_dias || (data?.detalle && (!descripcion || descripcion.length < 5)) || observacionInvalida()"
+            *ngIf="esVista">
+            {{this.modoEdicion === true ? !esAprobador ? "Modificar" : "Responder": "Enviar"}} Solicitud
+        </button>
+
+        <button mat-raised-button color="warn" (click)="salir()">
+            {{this.esVista ? "Cancelar": "Cerrar"}}
+        </button>
+    </div>
+</div>

@@ -1,0 +1,51 @@
+<div class="container">
+    <div class="notification-container" *ngIf="notification.message">
+        <div class="notification" [ngClass]="notification.type">
+            {{ notification.message }}
+        </div>
+    </div>
+
+    <div class="calendar-container">
+        <div class="header">
+            <h3>Planificación de Vacaciones - {{ anioGestion }}</h3>
+            <p>Días Restantes Gestión Actual: {{ diasRestantesActual }}</p>
+            <div *ngIf="this.data?.diasVacaciones.length === 2">
+                <p>Días Restantes Gestión Pasada: {{ diasRestantesAnterior }}</p>
+            </div>
+        </div>
+
+        <div class="calendar">
+            <div *ngFor="let mes of meses; let i = index" class="month">
+                <h4>{{ getNombreMes(i) }}</h4>
+                <div class="days-grid">
+                    <!-- Días de la semana -->
+                    <div *ngFor="let dia of diasSemana" class="day header">{{ dia }}</div>
+
+                    <!-- Días del mes -->
+                    <div *ngFor="let dia of getDiasDelMes(i)" [ngClass]="{
+                            'selected-morning': esDiaSeleccionadoTurno(dia, 'mañana') && dia.getMonth() === i,
+                            'selected-afternoon': esDiaSeleccionadoTurno(dia, 'tarde') && dia.getMonth() === i,
+                            'selected-full': esDiaSeleccionado(dia) && !esDiaSeleccionadoTurno(dia, 'mañana') && !esDiaSeleccionadoTurno(dia, 'tarde') && dia.getMonth() === i,
+                            'disabled': esDiaNoPermitido(dia),
+                            'blocked': esDiaPasado(dia),
+                            'previous-month': esDiaDelMesAnterior(dia, i)
+                        }" (click)="seleccionarDia(dia, i)" class="day">
+                        {{ dia.getDate() }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary">
+            <button mat-raised-button color="primary" (click)="guardarVacaciones()"
+                [disabled]="this.data ? diasRestantesActual !== 0 : false" *ngIf="habilitar === false" class="send"
+                tabindex="-1">
+                {{this.estado ? 'Modificar':'Solicitar'}} Planificación
+            </button>
+
+            <!-- Botón de salir -->
+            <button mat-raised-button color="warn" (click)="salir()" class="send" tabindex="-1">
+                Salir de Planificador
+            </button>
+        </div>
+    </div>

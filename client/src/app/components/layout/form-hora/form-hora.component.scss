@@ -1,0 +1,90 @@
+.hora-container {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 350px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.header {
+  text-align: center;
+}
+
+.titulo {
+  display: inline-flex; /* inline-flex mantiene el bloque centrado */
+  align-items: center;
+  justify-content: center;
+  gap: 6px; /* separación constante entre icono y texto */
+  font-size: 1.4rem;
+  color: #1e40af;
+}
+
+.icon-time {
+  flex-shrink: 0; /* El icono nunca se reduce */
+  //color: rgb(255, 0, 0);
+}
+
+.info-text {
+  text-align: center;
+  font-size: 0.95rem;
+  color: #475569;
+}
+
+.info-name {
+  text-align: center;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  color: #475569;
+  margin-top: -5px;
+  margin-bottom: 5px;
+}
+
+.form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.form-hour {
+  display: flex;
+  justify-content: space-between;
+  gap: 1px;
+}
+
+.form-field {
+  flex: 1;
+}
+
+.form-group {
+  text-align: center;
+}
+
+.error-text {
+  color: #dc2626;
+  font-weight: 500;
+  text-align: center;
+}
+
+.acciones {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.form-option {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+}
+
+.form-control {
+}

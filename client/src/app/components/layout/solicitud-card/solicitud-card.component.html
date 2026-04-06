@@ -1,0 +1,17 @@
+<div class="d-flex flex-wrap justify-content-center gap-3">
+    <div class="flex-grow-1 col-md-2" *ngFor="let card of contenidos" style="min-width: 290px; max-width: 400px;">
+        <mat-card class="solicitud-card h-100 bg-white" [ngClass]="'border-' + card.btn" (click)="solicitud(card)"
+            tabindex="0" role="button">
+            <!-- Header -->
+            <mat-card-header class="solicitud-header d-flex justify-content-center" [ngClass]="'header-' + card.btn">
+                <mat-card-title class="card-title">{{ card.titulo }}</mat-card-title>
+            </mat-card-header>
+
+            <!-- Contenido -->
+            <mat-card-content class="flex-grow-1">
+                <p class="card-encabezado">{{ card.encabezado }}</p>
+                <p class="text-muted op-7 text-justify card-descripcion">{{ card.descripcion }}</p>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>

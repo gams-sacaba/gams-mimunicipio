@@ -1,0 +1,248 @@
+.calendar-container {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 400px;
+  margin: auto;
+  font-family: "Roboto", sans-serif;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 0.8rem;
+}
+
+.titulo-solicitud {
+  display: inline-flex; /* inline-flex mantiene el bloque centrado */
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 1.4rem;
+  color: #1e40af;
+}
+
+.icon-time {
+  flex-shrink: 0; /* El icono nunca se reduce */
+}
+
+.info-text {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 10px;
+  background: #da9444ab;
+  border: 1px solid #cbd5e1;
+  padding: 5px 15px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+.info-name {
+  text-align: center;
+  font-size: 0.95rem;
+  color: #475569;
+}
+
+.info-cards {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  cursor: pointer;
+}
+
+.info-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f5f7ff;
+  border: 1px solid #cbd5e1;
+  padding: 8px 12px;
+  border-radius: 10px;
+}
+
+.info-card span {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.info-card strong {
+  display: block;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.form-option {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+}
+
+.month-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  gap: 10px;
+}
+
+.month-title {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #1e3a8a;
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  text-align: center;
+  font-size: 0.8rem;
+  padding: 8px;
+  border: 1px solid rgba(53, 53, 53, 0.568);
+  border-radius: 5px;
+}
+
+.day {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 1px 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.day:hover {
+  background-color: #e0ebff;
+}
+
+.day.header {
+  background: #ffffff;
+  //   color: #e91c0d;
+  //   text-transform: uppercase;
+  //   font-weight: 500;
+  //   letter-spacing: 1px;
+}
+
+.day.selected-full {
+  background-color: #2563eb;
+  color: white;
+}
+
+.day.selected-morning {
+  background-image: linear-gradient(0deg, #ffffff 0%, #93c5fd 70%, #1d4ed8 30%);
+  color: #1e3a8a;
+}
+
+.day.selected-afternoon {
+  background-image: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #93c5fd 70%,
+    #1d4ed8 30%
+  );
+  color: #1e3a8a;
+}
+
+.day.disabled {
+  background-color: #f87171;
+  color: white;
+  cursor: not-allowed;
+}
+
+.day.blocked,
+.previous-month {
+  background-color: #f1f5f9;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.resumen {
+  margin: 15px 0;
+}
+
+.summary-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.detalle-field {
+  width: 100%;
+}
+
+textarea[matInput] {
+  resize: vertical;
+}
+
+button[mat-raised-button],
+button[mat-stroked-button] {
+  min-width: 120px;
+}
+
+.resumen-dias-lista {
+  margin: 15px 0;
+  padding: 10px;
+  background: #fdfdfd;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.resumen-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #1e3a8a;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+  margin-bottom: 8px;
+}
+
+.resumen-header mat-icon {
+  font-size: 18px;
+  width: 16px;
+  height: 16px;
+}
+
+.scroll-resumen {
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.dia-fila-simple {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 5px;
+  border-bottom: 1px dashed #f1f5f9;
+  font-size: 0.85rem;
+}
+
+.dia-fila-simple:last-child {
+  border-bottom: none;
+}
+
+.fecha-info {
+  font-weight: 500;
+  color: #334155;
+}
+
+.jornada-info {
+  font-size: 0.75rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.jornada-info.completa {
+  color: #1e40af;
+  background: #dbeafe;
+}
+
+.jornada-info.media {
+  color: #92400e;
+  background: #fef3c7;
+}

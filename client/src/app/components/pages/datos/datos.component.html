@@ -1,0 +1,181 @@
+<div class="user-profile-container">
+    <!-- Datos Personales -->
+    <mat-card class="user-card">
+        <mat-card-header>
+            <mat-card-title>Datos Personales</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-form-field class="margin-input">
+                <mat-label>Nombre</mat-label>
+                <input matInput [(ngModel)]="personal.nombre" readonly />
+            </mat-form-field>
+            <mat-form-field class="margin-input-little">
+                <mat-label>Género</mat-label>
+                <input matInput [(ngModel)]="personal.genero" readonly />
+            </mat-form-field>
+            <mat-form-field class="margin-input">
+                <mat-label>C.I.</mat-label>
+                <input matInput [(ngModel)]="personal.ci" readonly />
+            </mat-form-field>
+            <mat-form-field class="margin-input">
+                <mat-label>Fecha Nacimiento</mat-label>
+                <input matInput [(ngModel)]="personal.fecha" readonly />
+            </mat-form-field>
+            <mat-form-field class="margin-input">
+                <mat-label>Teléfono</mat-label>
+                <input matInput [(ngModel)]="personal.telefono" readonly />
+            </mat-form-field>
+            <mat-form-field class="margin-input-little">
+                <mat-label>Hijos</mat-label>
+                <input matInput [(ngModel)]="personal.hijos" readonly />
+            </mat-form-field>
+            <mat-form-field class="margin-input">
+                <mat-label>Madre</mat-label>
+                <input matInput [(ngModel)]="personal.madre" readonly />
+            </mat-form-field>
+            <mat-form-field class="margin-input">
+                <mat-label>Padre</mat-label>
+                <input matInput [(ngModel)]="personal.padre" readonly />
+            </mat-form-field>
+        </mat-card-content>
+    </mat-card>
+
+    <!-- Profesional -->
+    <mat-card class="user-card">
+        <mat-card-header>
+            <mat-card-title>Datos Profesionales</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-form-field class="margin-input">
+                <mat-label>Grado Académico</mat-label>
+                <input matInput [(ngModel)]="profesional.grado" readonly />
+            </mat-form-field>
+            <mat-form-field class="margin-input">
+                <mat-label>Título Profesional</mat-label>
+                <input matInput [(ngModel)]="profesional.titulo" readonly />
+            </mat-form-field>
+            <mat-form-field class="margin-input-middle">
+                <mat-label>Cert. Egreso</mat-label>
+                <input matInput [(ngModel)]="profesional.egreso" readonly />
+            </mat-form-field>
+            <mat-form-field class="margin-input-middle">
+                <mat-label>Cert. Estudio</mat-label>
+                <input matInput [(ngModel)]="profesional.estudio" readonly />
+            </mat-form-field>
+            <mat-form-field class="margin-input">
+                <mat-label>Diploma Bachiller</mat-label>
+                <input matInput [(ngModel)]="profesional.diploma" readonly />
+            </mat-form-field>
+            <mat-form-field class="margin-input">
+                <mat-label>Fotocopia Título</mat-label>
+                <input matInput [(ngModel)]="profesional.fotocopia" readonly />
+            </mat-form-field>
+            <mat-form-field class="margin-input">
+                <mat-label>Experiencia Laboral</mat-label>
+                <input matInput [(ngModel)]="profesional.experiencia" readonly />
+            </mat-form-field>
+        </mat-card-content>
+    </mat-card>
+
+    <!-- Documentos -->
+    <mat-card class="user-card">
+        <mat-card-header>
+            <mat-card-title>Documentos</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-checkbox [(ngModel)]="documentos.DJ" disabled>Declaración Jurada</mat-checkbox>
+            <mat-checkbox [(ngModel)]="documentos.REJAP" disabled>REJAP</mat-checkbox>
+            <mat-checkbox [(ngModel)]="documentos.CENVI" disabled>CENVI</mat-checkbox>
+            <mat-checkbox [(ngModel)]="documentos.LB" disabled>Libreta Militar</mat-checkbox>
+            <mat-checkbox [(ngModel)]="documentos.HV" disabled>Hoja de Vida</mat-checkbox>
+            <mat-checkbox [(ngModel)]="documentos.CN" disabled>Certificado de Nacimiento</mat-checkbox>
+            <mat-checkbox [(ngModel)]="documentos.CD" disabled>Croquis de Domicilio</mat-checkbox>
+        </mat-card-content>
+    </mat-card>
+
+    <!-- Certificados -->
+    <mat-card class="user-card">
+        <mat-card-header>
+            <mat-card-title>Certificados</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-checkbox [(ngModel)]="certificados.QUECHUA" disabled>Idioma Nativo (Quechua)</mat-checkbox>
+            <mat-checkbox [(ngModel)]="certificados['1178']" disabled>Ley 1178</mat-checkbox>
+            <mat-checkbox [(ngModel)]="certificados.PB" disabled>Políticas Públicas</mat-checkbox>
+            <mat-checkbox [(ngModel)]="certificados.RFP" disabled>Responsabilidad por la Función Pública</mat-checkbox>
+        </mat-card-content>
+    </mat-card>
+
+    <!-- Declaración -->
+    <mat-card class="user-card">
+        <mat-card-header>
+            <mat-card-title>Declaración Jurada</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-checkbox [(ngModel)]="declaracion.IDP" disabled>DDJJ. De incompatibilidad de Doble
+                Percepción</mat-checkbox>
+            <mat-checkbox [(ngModel)]="declaracion.GP" disabled>DDJJ. De Grado de Parentesco</mat-checkbox>
+        </mat-card-content>
+    </mat-card>
+
+    <!-- Licencias -->
+    <mat-card class="user-card">
+        <mat-card-header>
+            <mat-card-title>Licencias</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-checkbox [(ngModel)]="licencias.M" disabled>Cat. M</mat-checkbox>
+            <mat-checkbox [(ngModel)]="licencias.P" disabled>Cat. P</mat-checkbox>
+            <mat-checkbox [(ngModel)]="licencias.T" disabled>Cat. T</mat-checkbox>
+            <mat-checkbox [(ngModel)]="licencias.A" disabled>Cat. A</mat-checkbox>
+            <mat-checkbox [(ngModel)]="licencias.B" disabled>Cat. B</mat-checkbox>
+            <mat-checkbox [(ngModel)]="licencias.C" disabled>Cat. C</mat-checkbox>
+        </mat-card-content>
+    </mat-card>
+
+    <!-- Datos Institucionales -->
+    <mat-card class="user-card">
+        <mat-card-header>
+            <mat-card-title>Datos Institucionales</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-form-field class="margin-input">
+                <mat-label>Ficha</mat-label>
+                <input matInput [(ngModel)]="institucional.ficha" readonly />
+            </mat-form-field>
+            <mat-form-field class="margin-input-middle">
+                <mat-label>Sanciones</mat-label>
+                <input matInput [(ngModel)]="institucional.sanciones" readonly />
+            </mat-form-field>
+            <mat-form-field class="margin-input">
+                <mat-label>Afilicación Caja Cordes</mat-label>
+                <input matInput [(ngModel)]="institucional.caja" readonly />
+            </mat-form-field>
+            <mat-form-field class="margin-input">
+                <mat-label>Evaluación de Desempeño</mat-label>
+                <input matInput [(ngModel)]="institucional.evaluacion" readonly />
+            </mat-form-field>
+            <mat-form-field class="margin-input">
+                <mat-label>Calificación Años Servicio</mat-label>
+                <input matInput [(ngModel)]="institucional.servicio" readonly />
+            </mat-form-field>
+            <mat-form-field class="margin-input">
+                <mat-label>Registro RPA/RAE</mat-label>
+                <input matInput [(ngModel)]="institucional.registro" readonly />
+            </mat-form-field>
+        </mat-card-content>
+    </mat-card>
+
+    <!-- Discapacidad -->
+    <mat-card class="user-card">
+        <mat-card-header>
+            <mat-card-title>Discapacidad</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-form-field class="margin-input-middle">
+                <mat-label>Discapacidad</mat-label>
+                <input matInput [(ngModel)]="discapacidad.discapacidad" readonly />
+            </mat-form-field>
+        </mat-card-content>
+    </mat-card>
+</div>

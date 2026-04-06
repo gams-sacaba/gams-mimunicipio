@@ -1,0 +1,67 @@
+.vacaciones-form {
+  width: 100% !important;
+  margin: auto !important;
+  padding: 15px !important;
+}
+
+.container-date {
+  max-height: 230px;
+  overflow-y: auto;
+  border: 1px solid #e0e0e0;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.calendario-contenedor {
+  position: absolute; /* Flotante */
+  top: 100px; /* Ajusta según tu diseño */
+  left: 0; /* O usa left: 0 para posicionarlo al lado izquierdo */
+  z-index: 1000; /* Asegúrate de que esté encima de otros elementos */
+  background-color: white; /* Fondo para destacar el calendario */
+  border: 1px solid #ccc; /* Opcional: borde */
+  border-radius: 8px; /* Opcional: bordes redondeados */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para un mejor diseño */
+  padding: 8px;
+}
+
+.calendario-contenedor mat-calendar {
+  max-width: 320px; /* Ajusta el ancho si es necesario */
+}
+
+.dia-item {
+  margin-bottom: 0px;
+}
+
+.mat-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.margin-top {
+  margin-top: -10px;
+}
+
+.summary {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+button.send {
+  width: 150px;
+  margin: 0 10px;
+}
+
+.mat-calendar-body-selected {
+  background-color: #3f51b5;
+  color: white;
+}
+
+.alert {
+  padding: 10px;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  background-color: #f8d7da;
+  color: #721c24;
+  font-size: 14px;
+}

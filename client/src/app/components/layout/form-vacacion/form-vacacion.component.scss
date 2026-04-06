@@ -1,0 +1,161 @@
+/* En el archivo de estilos del componente del diálogo */
+.container {
+  width: 100%;
+  padding: 15px;
+  overflow-y: auto;
+  max-height: 820px;
+}
+
+.calendar-container {
+  width: 100%;
+  font-family: Arial, sans-serif;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.calendar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.month {
+  flex: 1 1 calc(33.33% - 20px);
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fff;
+  padding: 10px;
+}
+
+.month h4 {
+  text-align: center;
+  margin: 0;
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.day {
+  font-size: 12px;
+  text-align: center;
+  padding: 3px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.day:hover {
+  background-color: #f0f0f0;
+}
+
+.day.selected-morning {
+  padding-top: 8px;
+  background-color: #ffffff;
+  background-image: linear-gradient(0deg, #ffffff 0%, #92aaff 70%, #3655b2 30%);
+  color: black;
+}
+
+.day.selected-afternoon {
+  padding-bottom: 6px;
+  background-color: #ffffff;
+  background-image: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #92aaff 70%,
+    #3655b2 30%
+  );
+  color: black;
+}
+
+.day.selected-full {
+  background-color: #3655b2;
+  color: white;
+}
+
+.day.disabled {
+  background-color: #f44336;
+  color: #fff;
+  cursor: not-allowed;
+}
+
+.day.blocked {
+  cursor: not-allowed;
+}
+
+.summary {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.previous-month {
+  background-color: #e0e0e0; /* Gris claro */
+  color: #b0b0b0; /* Gris oscuro */
+  pointer-events: none; /* Desactiva clic */
+}
+
+.notification-container {
+  width: 50%;
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification {
+  padding: 10px 20px;
+  border-radius: 5px;
+  color: white;
+  font-size: 14px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.5s, fadeOut 0.5s ease-out 2.5s;
+}
+
+.notification.success {
+  background-color: #4caf50;
+}
+
+.notification.error {
+  background-color: #f44336;
+}
+
+.notification.info {
+  background-color: #2196f3;
+}
+
+.send {
+  margin-left: 5px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}

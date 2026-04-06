@@ -1,0 +1,69 @@
+.modal-container {
+  text-align: center;
+  padding: 20px;
+}
+
+.title {
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.subtitle {
+  margin-bottom: 16px;
+  color: #666;
+  font-size: 14px;
+}
+
+.options,
+.turno-options {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.option-card {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 5px;
+  border-radius: 12px;
+  text-align: center;
+  transition: all 0.25s ease;
+  border: 2px solid transparent;
+
+  mat-icon {
+    height: auto;
+    font-size: 25px;
+    color: #3f51b5;
+  }
+
+  span {
+    font-weight: 500;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.option-card.small {
+  width: 100%;
+
+  mat-icon {
+    font-size: 25px;
+  }
+}
+
+.option-card.selected {
+  border-color: #3f51b5;
+  background-color: #f3f5ff;
+}
+
+.actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}

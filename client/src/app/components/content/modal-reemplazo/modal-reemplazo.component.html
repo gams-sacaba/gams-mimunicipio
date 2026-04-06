@@ -1,0 +1,23 @@
+<div class="container-option">
+    <mat-form-field appearance="fill" [style.width.%]="100">
+        <mat-label>Buscar reemplazo</mat-label>
+        <input type="text" matInput #input [matAutocomplete]="reemplazo" [formControl]="searchControl"
+            placeholder="Buscar por nombre, apellido paterno o materno">
+        <mat-autocomplete autoActiveFirstOption #reemplazo="matAutocomplete" [displayWith]="displayFn"
+            (optionSelected)="seleccionarReemplazo($event)">
+            <mat-option *ngFor="let persona of filteredPersonal | async" [value]="persona">
+                {{ persona.datosFuncionario.nombre }} {{ persona.datosFuncionario.paterno }} {{
+                persona.datosFuncionario.materno }}
+                ({{ persona.datosFuncionario.ci }})
+            </mat-option>
+        </mat-autocomplete>
+        <button mat-icon-button matSuffix *ngIf="searchControl.value !== ''" (click)="clearInput()">
+            <mat-icon>clear</mat-icon>
+        </button>
+    </mat-form-field>
+</div>
+
+<div class="actions">
+    <button mat-button color="primary" (click)="aceptar()">Aceptar</button>
+    <button mat-button color="warn" (click)="cancelar()">Cancelar</button>
+</div>

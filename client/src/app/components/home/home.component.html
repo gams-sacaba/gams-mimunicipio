@@ -1,0 +1,116 @@
+<div class="app-container" [class.mobile]="mobileQuery.matches">
+
+    <mat-sidenav-container class="sidenav-container">
+
+        <!-- Barra lateral izquierda -->
+        <mat-sidenav #snav [mode]="mobileQuery.matches ? 'over' : 'side'" [opened]="!mobileQuery.matches"
+            fixedInViewport>
+
+            <!-- Logo arriba -->
+            <div class="sidenav-logo">
+                <img src="assets/img/logo_alcaldia_vertical.jpeg" alt="Logo" />
+            </div>
+
+            <mat-nav-list *ngIf="accessibleModules$ | async as modules">
+
+                <a mat-list-item routerLink="bandeja" [class.active-link]="getActiveLink() === 'bandeja'"
+                    (click)="setActiveLink('bandeja')" *ngIf="modules?.hasOwnProperty('bandeja')">
+                    <div class="icon" style="height: auto;  margin-top: 5px;">
+                        <mat-icon [matBadge]="countBandeja" matBadgeColor="warn"
+                            [matBadgeHidden]="countBandeja === 0">mail_outline</mat-icon> <span>Bandeja</span>
+                    </div>
+                </a>
+
+                <!-- <a mat-list-item routerLink="datos" [class.active-link]="getActiveLink() === 'datos'"
+                    (click)="setActiveLink('datos')" *ngIf="modules?.hasOwnProperty('datos')">
+                    <div class="icon">
+                        <mat-icon>work_outline</mat-icon> <span>Datos</span>
+                    </div>
+                </a> -->
+
+                <a mat-list-item routerLink="solicitudes" [class.active-link]="getActiveLink() === 'solicitudes'"
+                    (click)="setActiveLink('solicitudes')" *ngIf="modules?.hasOwnProperty('solicitudes')">
+                    <div class="icon">
+                        <mat-icon>poll</mat-icon><span>Solicitudes</span>
+                    </div>
+                </a>
+
+                <mat-divider style="margin-top: 5px; margin-bottom: 5px;"></mat-divider>
+
+                <a mat-list-item routerLink="ayuda" [class.active-link]="getActiveLink() === 'ayuda'"
+                    (click)="setActiveLink('ayuda')">
+                    <div class="icon">
+                        <mat-icon style="font-size: 20px;">help_outline</mat-icon><span>Centro de Ayuda</span>
+                    </div>
+                </a>
+
+            </mat-nav-list>
+        </mat-sidenav>
+
+        <!-- Contenido principal -->
+        <mat-sidenav-content class="content">
+
+            <!-- Barra superior -->
+            <mat-toolbar class="top-toolbar">
+                <button mat-icon-button (click)="snav.toggle()"><mat-icon>menu</mat-icon></button>
+                <div class="toolbar-title">
+                    <h1 class="app-name">
+                        <span class="app-highlight">Mi</span>Mu<span class="animated">N</span>icipio
+                    </h1>
+
+                    <div class="user-account">
+                        <div class="notification-bell">
+                            <button mat-icon-button [matMenuTriggerFor]="notifMenu" (click)="marcarComoLeidas()">
+                                <mat-icon [matBadge]="unreadCount" matBadgeColor="warn"
+                                    [matBadgeHidden]="unreadCount === 0">
+                                    notifications
+                                </mat-icon>
+                            </button>
+
+                            <mat-menu #notifMenu="matMenu" class="notification-menu">
+                                <h4 class="notif-title">Notificaciones</h4>
+                                <mat-divider></mat-divider>
+
+                                <div *ngIf="notificaciones.length === 0" class="no-notif">
+                                    No tienes notificaciones nuevas
+                                </div>
+
+                                <button mat-menu-item *ngFor="let n of notificaciones">
+                                    <div class="notif-item">
+                                        <span class="notif-msg">{{ n.mensaje }}</span>
+                                        <small class="notif-date">{{ n.fecha | date:'shortTime' }}</small>
+                                    </div>
+                                </button>
+                            </mat-menu>
+                        </div>
+
+                        <div class="user-box" (click)="toggleDropdown()">
+                            <mat-icon class="account-icon">account_circle</mat-icon>
+                            <mat-icon class="dropdown-arrow" [class.open]="showDropdown">expand_more</mat-icon>
+                            <span class="user-name">{{ name() }}</span>
+                        </div>
+
+                        <!-- Menú desplegable -->
+                        <div class="dropdown" *ngIf="showDropdown">
+                            <button mat-button (click)="changePassword()">
+                                Modificar Contraseña
+                            </button>
+                            <button mat-button (click)="logout()">
+                                <div class="icon">
+                                    <mat-icon>exit_to_app</mat-icon>
+                                    <span>Cerrar sesión</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </mat-toolbar>
+
+            <!-- Contenido principal del router -->
+            <div class="main-content">
+                <router-outlet></router-outlet>
+            </div>
+
+        </mat-sidenav-content>
+    </mat-sidenav-container>
+</div>

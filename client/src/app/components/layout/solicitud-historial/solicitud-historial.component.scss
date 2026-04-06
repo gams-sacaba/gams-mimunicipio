@@ -1,0 +1,124 @@
+.table-responsive {
+  overflow-x: auto;
+}
+
+td.mat-cell {
+  padding: 16px;
+}
+
+th.mat-header-cell:first-of-type,
+td.mat-cell:first-of-type,
+td.mat-footer-cell:first-of-type {
+  padding: 16px;
+}
+
+th.mat-header-cell {
+  padding: 16px;
+}
+
+.mat-header-cell {
+  font-size: 14px;
+}
+
+.estado {
+  border: 1px solid #ccc; /* Border for the square */
+  border-radius: 5px; /* Rounded corners */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Shadow for a 3D effect */
+  width: 90px; /* Fixed width */
+  padding: 5px; /* Padding around text */
+  display: flex; /* Flexbox to center content */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  cursor: pointer;
+}
+
+.estado-enviado {
+  color: white;
+  background-color: #4ed8f0; /* Verde para enviado */
+}
+
+.estado-pendiente {
+  background-color: #f0ad4e; /* Amarillo para pendiente */
+}
+
+.estado-rechazado {
+  color: white;
+  background-color: #dc3545; /* Rojo para rechazado */
+}
+
+.estado-denegado {
+  background-color: #6b0000; /* Quindo para denegado */
+  color: white;
+}
+
+.estado-aprobado {
+  background-color: #28a745; /* Verde para aprobado */
+  color: white;
+}
+
+.estado-vencido {
+  background-color: #6c757d; /* Gris para vencido */
+}
+
+.trayectoria-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+
+  .paso-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .paso-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    cursor: help;
+    transition: transform 0.2s ease;
+    color: #94a3b8; // Color base gris suave
+
+    &:hover {
+      transform: scale(1.2);
+    }
+
+    &.activo {
+      color: #1e40af;
+    } // Azul fuerte
+    &.aprobado {
+      color: #10b981;
+    } // Esmeralda
+    &.rechazado {
+      color: #ef4444;
+    } // Rojo
+    &.pendiente {
+      color: #f59e0b;
+    } // Ámbar
+  }
+
+  .flecha-separador {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    margin: 0 4px;
+    color: #cbd5e1;
+
+    &.pulse {
+      animation: sideBySide 2s infinite;
+    }
+  }
+}
+
+// Animación sutil para la flecha de pendiente
+@keyframes sideBySide {
+  0%,
+  100% {
+    transform: translateX(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateX(3px);
+    opacity: 1;
+  }
+}

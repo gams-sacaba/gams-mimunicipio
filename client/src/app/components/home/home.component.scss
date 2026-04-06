@@ -1,0 +1,288 @@
+/* Contenedor principal */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  &.mobile .top-toolbar {
+    position: fixed;
+    z-index: 2;
+  }
+}
+
+/* Sidenav */
+.sidenav-container {
+  flex: 1;
+  height: 100vh;
+  background-color: #c4c4c449;
+
+  mat-sidenav {
+    width: 190px;
+    border-right: 3px solid #154c79;
+    padding: 0 3px;
+    background-color: #ffffff;
+    // background-image: linear-gradient(
+    //   to right,
+    //   rgba(0, 204, 255, 0.356) 0%,
+    //   /*#242424 90%*/ #001d3da4 90%
+    // );
+  }
+
+  mat-nav-list a {
+    width: 100%;
+    height: 40px;
+    border-radius: 5px;
+  }
+  /*cambiar color hover menu*/
+  mat-nav-list a:hover * {
+    transition: 1.5ms;
+    font-size: 15px;
+    color: #154c79;
+  }
+
+  .list:hover {
+    background-color: #d6e4fc28;
+  }
+
+  .icon {
+    display: flex;
+    align-items: center;
+
+    span {
+      margin-left: 8px;
+    }
+  }
+}
+
+/* Barra superior */
+.content {
+  padding: 0 5px;
+}
+
+.top-toolbar {
+  margin-left: 15px;
+  width: calc(100% - 30px);
+  border-radius: 10px;
+  background-color: rgb(255, 255, 255);
+  //   background-image: radial-gradient(
+  //     circle farthest-corner at 50.4% 50.5%,
+  //     rgb(255, 255, 255) 0%,
+  //     rgba(15, 155, 173, 0.658) 70%
+  //   );
+}
+
+/* Clase para la opción activa del menú */
+.active-link {
+  background-color: rgba(3, 129, 122, 0.2);
+  color: rgb(44, 253, 243);
+  font-weight: bold;
+  border-left: 4px solid #154c79;
+}
+
+/* Título y cuenta de usuario */
+.toolbar-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+
+  .app-name {
+    font-weight: 600;
+    font-size: 20px;
+    text-align: center;
+    display: inline-block;
+    letter-spacing: 1.5px;
+    color: #154c79;
+    cursor: pointer;
+
+    .app-highlight {
+      //color: #154c79;
+      font-weight: 500;
+    }
+    .animated {
+      display: inline-block;
+      animation: jump 10s infinite;
+      //color: #154c79;
+      font-weight: 500;
+    }
+  }
+
+  .user-account {
+    display: flex;
+    align-items: center;
+
+    .account-icon {
+      border-radius: 100px;
+      font-size: 38px;
+      width: 38px;
+      height: 38px;
+      cursor: pointer;
+      transition:
+        color 0.2s ease,
+        transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55),
+        filter 0.2s ease,
+        box-shadow 0.2s ease;
+
+      &:hover {
+        color: #000000;
+        transform: scale(1.05);
+        filter: drop-shadow(0 4px 6px rgba(41, 121, 255, 0.6));
+        box-shadow: 0 4px 15px rgba(41, 121, 255, 0.4);
+      }
+    }
+
+    .user-box {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .user-name {
+      font-size: 14px;
+      margin-left: 8px;
+      cursor: pointer;
+    }
+
+    .dropdown {
+      position: absolute;
+      top: 63px;
+      right: 0;
+      background: #f0f0f0;
+      //border: 1px solid rgb(44, 253, 243);
+      border-radius: 4px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      animation: fadeIn 0.2s ease-in-out;
+      z-index: 1000;
+      margin-right: 18px;
+      padding: 5px;
+
+      .dropdown button {
+        width: 100%;
+        text-align: left;
+        display: flex;
+        align-items: center;
+
+        mat-icon {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+}
+
+.dropdown-arrow {
+  font-size: 22px;
+  margin-left: 0;
+  transition: transform 0.25s ease;
+}
+
+.dropdown-arrow.open {
+  transform: rotate(180deg);
+}
+
+/* Contenido principal del router */
+.main-content {
+  flex: 1;
+  overflow: auto;
+}
+
+/* Logo en la barra lateral */
+.sidenav-logo {
+  width: 100%;
+  //padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+  background-color: rgba(255, 255, 255, 0.945);
+  border-top-right-radius: 15px;
+
+  img {
+    max-width: 100%; /* Ajusta según el tamaño del logo */
+    height: auto;
+  }
+}
+
+.notification-bell {
+  margin-right: 15px;
+  .notif-title {
+    padding: 10px 16px;
+    margin: 0;
+    font-weight: 600;
+    color: #333;
+  }
+}
+
+.no-notif {
+  padding: 20px;
+  text-align: center;
+  color: #888;
+  font-size: 0.9rem;
+}
+
+.notif-item {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.4;
+
+  .notif-msg {
+    white-space: normal;
+    font-size: 10px;
+  }
+
+  .notif-date {
+    color: #999;
+  }
+}
+
+::ng-deep .notification-menu {
+  margin-top: 11px;
+  padding: 0;
+
+  .notif-title {
+    font-size: 15px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .mat-menu-item {
+    font-size: 10px;
+    line-height: 1.2;
+    height: auto;
+    padding: 10px 16px;
+  }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Keyframes for jumping animation */
+@keyframes jump {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(0) rotate(360deg); /* Move up and rotate */
+  }
+}
