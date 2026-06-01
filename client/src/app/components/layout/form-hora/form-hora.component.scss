@@ -14,17 +14,16 @@
 }
 
 .titulo {
-  display: inline-flex; /* inline-flex mantiene el bloque centrado */
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px; /* separación constante entre icono y texto */
+  gap: 6px;
   font-size: 1.4rem;
   color: #1e40af;
 }
 
 .icon-time {
-  flex-shrink: 0; /* El icono nunca se reduce */
-  //color: rgb(255, 0, 0);
+  flex-shrink: 0;
 }
 
 .info-text {

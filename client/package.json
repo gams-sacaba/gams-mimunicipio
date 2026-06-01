@@ -1,10 +1,16 @@
 {
-  "name": "users",
+  "name": "MiMunicipio",
   "version": "0.0.0",
+  "author": {
+    "name": "Ramzeb",
+    "email": "ramzeb@gmail.com"
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:prod": "ng build --configuration=production",
+    "build:test": "ng build --configuration=test",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

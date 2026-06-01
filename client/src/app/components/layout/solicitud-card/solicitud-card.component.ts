@@ -125,7 +125,7 @@ export class SolicitudCardComponent implements OnChanges, OnDestroy, OnInit {
   solicitud(selection: any) {
     selection.id_registro = this._idRegistro;
     selection.esVista = true;
-    console.log('seleccion: ', selection);
+
     if (this.data) {
       switch (selection?.categoria) {
         case 'CALENDARIO':
@@ -142,7 +142,6 @@ export class SolicitudCardComponent implements OnChanges, OnDestroy, OnInit {
   }
 
   categoriaFecha(contenido: any) {
-    console.log('crear: ', contenido);
     const dialogRef = this.dialog.open(FormFechaComponent, {
       data: contenido,
       maxWidth: '450px',
@@ -264,7 +263,6 @@ export class SolicitudCardComponent implements OnChanges, OnDestroy, OnInit {
   }
 
   categoriaHora(contenido: any) {
-    console.log('crear: ', contenido);
     const dialogRef = this.dialog.open(FormHoraComponent, {
       data: contenido,
       maxWidth: '950px',

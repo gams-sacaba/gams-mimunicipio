@@ -9,6 +9,7 @@ import { SolicitudesService } from '../../../services/solicitudes.service';
 import { ModalReemplazoComponent } from '../../content/modal-reemplazo/modal-reemplazo.component';
 import { AuthService } from '../../../services/auth.service';
 import { convertToTimezone, getIncialesMayuscula } from '../../../utils/utils';
+import { RestriccionesService } from '../../../services/restricciones.service';
 
 @Component({
   selector: 'app-form-fecha',
@@ -63,12 +64,15 @@ export class FormFechaComponent {
 
   id_recursos_humanos: string = '695808c0a886da9f714a6945';
 
+  fechasOriginalesEdicion: string[] = [];
+
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     public dialog: MatDialog,
     public dialogRef: MatDialogRef<FormFechaComponent>,
     private authService: AuthService,
     private solicitudService: SolicitudesService,
+    private restriccionService: RestriccionesService,
   ) {
     this._idRegistro = this.authService.getUserRegistro().toString();
     this._idAprobador = this.authService.getAprobador().toString();
@@ -104,6 +108,7 @@ export class FormFechaComponent {
 
   cargarPlanificacionExistente(planificaciones: any[]): void {
     this.diasSeleccionados = [];
+    this.fechasOriginalesEdicion = [];
     this.diasDisponibles = this.data?.restricciones?.limite_dias || 0;
 
     planificaciones.forEach((planificacion, index) => {
@@ -119,6 +124,7 @@ export class FormFechaComponent {
           gestion: planificacion.gestion,
           solicitudIndex: index,
         });
+        this.fechasOriginalesEdicion.push(fechaLocal.toDateString());
         this.diasDisponibles -= dia.jornada === 'media' ? 0.5 : 1;
       });
     });
@@ -228,36 +234,106 @@ export class FormFechaComponent {
     return isFestivo || isInRangoNoPermitido;
   }
 
-  esDiaPasado(dia: Date): boolean {
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
-
-    const diasAnticipacion: number =
-      this.data?.restricciones?.max_dias_anticipacion ?? 0;
-    const diasPlazo: number = this.data?.restricciones?.max_dias_plazo ?? 0;
-
-    const fechaMinima = new Date(hoy);
-    fechaMinima.setDate(hoy.getDate() + diasAnticipacion);
-
-    const fechaMaxima = new Date(hoy);
-    fechaMaxima.setDate(hoy.getDate() - diasPlazo);
-
-    if (diasAnticipacion !== 0 && dia < fechaMinima) {
-      return true;
-    }
-
-    if (diasPlazo !== 0 && (dia < fechaMaxima || dia > fechaMinima)) {
-      return true;
-    }
-
-    return false;
-  }
-
   esDiaDelMesAnterior(dia: Date, mesIndex: number): boolean {
     const fechaInicioMes = new Date(this.anioGestion, mesIndex, 1);
     const fechaFinMes = new Date(this.anioGestion, mesIndex + 1, 0);
 
     return dia < fechaInicioMes || dia > fechaFinMes;
+  }
+
+  esDiaPasado(dia: Date): boolean {
+    if (!dia) return true;
+
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const fechaCalendario = new Date(dia);
+    fechaCalendario.setHours(0, 0, 0, 0);
+
+    if (
+      this.modoEdicion &&
+      this.fechasOriginalesEdicion.includes(fechaCalendario.toDateString())
+    ) {
+      return false;
+    }
+
+    const aplicarDiasHabiles = this.restricciones?.dias_habiles ?? false;
+    if (aplicarDiasHabiles) {
+      const nroDiaSemana = fechaCalendario.getDay();
+      if (nroDiaSemana === 0 || nroDiaSemana === 6) return true;
+    }
+
+    const diaCierre = this.restricciones?.cierre_administrativo ?? 0;
+    let fechaInicioPlanilla: Date | null = null;
+
+    if (diaCierre > 0) {
+      if (diaCierre >= 30) {
+        fechaInicioPlanilla = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+
+        if (
+          hoy.getDate() > diaCierre &&
+          fechaCalendario.getMonth() === hoy.getMonth()
+        )
+          return true;
+      } else {
+        fechaInicioPlanilla =
+          hoy.getDate() <= diaCierre
+            ? new Date(hoy.getFullYear(), hoy.getMonth() - 1, diaCierre + 1)
+            : new Date(hoy.getFullYear(), hoy.getMonth(), diaCierre + 1);
+      }
+
+      if (fechaCalendario < fechaInicioPlanilla) return true;
+    }
+
+    const plz = this.restricciones?.max_dias_plazo ?? 0;
+    const ant = this.restricciones?.max_dias_anticipacion ?? 0;
+
+    if (plz === 0 && ant === 0) {
+      return false;
+    }
+
+    if (plz > 0) {
+      const fechaMinimaPermitida =
+        this.restriccionService.obtenerFechaMinimaPermitida(
+          hoy,
+          plz,
+          this.restricciones,
+        );
+
+      const limiteRealAtras =
+        fechaInicioPlanilla && fechaMinimaPermitida < fechaInicioPlanilla
+          ? fechaInicioPlanilla
+          : fechaMinimaPermitida;
+
+      if (fechaCalendario < limiteRealAtras) return true;
+    } else if (plz < 0 && ant === 0) {
+      if (fechaCalendario < hoy) return true;
+    }
+
+    if (ant > 0) {
+      const fechaMinimaFutura =
+        this.restriccionService.obtenerFechaMinimaFutura(
+          hoy,
+          ant,
+          this.restricciones,
+        );
+      if (fechaCalendario < fechaMinimaFutura) return true;
+    } else if (ant < 0) {
+      const diasHaciaFuturo = Math.abs(ant);
+      const fechaMaximaFutura =
+        this.restriccionService.obtenerFechaMinimaFutura(
+          hoy,
+          diasHaciaFuturo,
+          this.restricciones,
+        );
+
+      if (fechaCalendario > fechaMaximaFutura) return true;
+    } else if (ant === 0 && plz > 0) {
+      if (fechaCalendario > hoy) return true;
+    } else if (ant === 0 && plz < 0) {
+      return false;
+    }
+
+    return false;
   }
 
   obtenerIndiceSolicitud(dia: Date): number {

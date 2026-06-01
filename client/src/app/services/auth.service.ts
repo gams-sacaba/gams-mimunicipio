@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap, map } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 
-import { conexion } from '../../environments/environment.prod';
+import { conexion } from '../../environments/environment';
 import { SocketService } from './socket.service';
 
 const base_url = conexion.server.base_url + '/session';
@@ -37,6 +37,7 @@ export class AuthService {
     private http: HttpClient,
     private router: Router,
     private dialog: MatDialog,
+    private ngZone: NgZone,
     private socketService: SocketService,
   ) {
     const savedData = localStorage.getItem('userData');
@@ -48,6 +49,12 @@ export class AuthService {
     if (token) {
       setTimeout(() => this.socketService.connect(token), 500);
     }
+
+    this.socketService.forceLogout$.subscribe(() => {
+      this.ngZone.run(() => {
+        this.logout();
+      });
+    });
   }
 
   private hasToken(): boolean {
@@ -125,13 +132,12 @@ export class AuthService {
     options?: number;
   }): Observable<any> {
     payload.options = 1;
-    return this.http.put(`${base_url}/update`, payload);
+    return this.http.put(`${base_url}/reset-password`, payload);
   }
 
   login(credentials: { username: string; password: string; role: number }) {
-    return this.http.post<any>(`${base_url}`, credentials).pipe(
+    return this.http.post<any>(`${base_url}/login-session`, credentials).pipe(
       tap((user) => {
-        console.log(user);
         if (user && user.token) {
           localStorage.setItem('token', user.token);
           localStorage.setItem('role', user.role);

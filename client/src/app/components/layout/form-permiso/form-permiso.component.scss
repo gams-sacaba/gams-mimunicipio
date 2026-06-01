@@ -13,19 +13,19 @@
 }
 
 .calendario-contenedor {
-  position: absolute; /* Flotante */
-  top: 100px; /* Ajusta según tu diseño */
-  left: 0; /* O usa left: 0 para posicionarlo al lado izquierdo */
-  z-index: 1000; /* Asegúrate de que esté encima de otros elementos */
-  background-color: white; /* Fondo para destacar el calendario */
-  border: 1px solid #ccc; /* Opcional: borde */
-  border-radius: 8px; /* Opcional: bordes redondeados */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para un mejor diseño */
+  position: absolute;
+  top: 100px;
+  left: 0;
+  z-index: 1000;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding: 8px;
 }
 
 .calendario-contenedor mat-calendar {
-  max-width: 320px; /* Ajusta el ancho si es necesario */
+  max-width: 320px;
 }
 
 .dia-item {

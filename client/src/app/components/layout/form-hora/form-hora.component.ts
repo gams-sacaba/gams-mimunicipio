@@ -4,6 +4,7 @@ import { SolicitudesService } from '../../../services/solicitudes.service';
 import { AuthService } from '../../../services/auth.service';
 
 import { getIncialesMayuscula } from '../../../utils/utils';
+import { RestriccionesService } from '../../../services/restricciones.service';
 
 @Component({
   selector: 'app-form-hora',
@@ -18,7 +19,7 @@ export class FormHoraComponent implements OnInit {
   fechaSalida: Date | null = null;
   horaInicio: string = '';
   horaFin: string = '';
-  motivo: string = '';
+  descripcion: string = '';
   horaRangoInvalido: boolean = false;
   esAprobador: boolean = false;
   esDetalle: boolean = false;
@@ -30,6 +31,7 @@ export class FormHoraComponent implements OnInit {
   solicitudId: string | null = null;
   solicitud: any;
   observacion: string = '';
+  restricciones: any;
 
   id_recursos_humanos: string = '695808c0a886da9f714a6945';
   RangoMinFecha = new Date(2026, 0, 1);
@@ -40,6 +42,7 @@ export class FormHoraComponent implements OnInit {
     private dialogRef: MatDialogRef<FormHoraComponent>,
     private authService: AuthService,
     private solicitudService: SolicitudesService,
+    private restriccionService: RestriccionesService,
   ) {
     this._idRegistro = this.authService.getUserRegistro().toString();
     this._idAprobador = this.authService.getAprobador().toString();
@@ -61,36 +64,117 @@ export class FormHoraComponent implements OnInit {
       this.data = this.data.id_contenido;
       this.cargarDatosEdicion(this.solicitud);
     }
+    this.restricciones = this.data.restricciones;
   }
 
-  /** Cargar datos si se está editando */
   cargarDatosEdicion(solicitud: any): void {
     this.solicitudId = solicitud._id;
     this.fechaSalida = solicitud.fecha_inicio;
     this.horaInicio = solicitud.hora_inicio || '';
     this.horaFin = solicitud.hora_fin || '';
-    this.motivo = solicitud.detalle || '';
+    this.descripcion = solicitud.detalle || '';
   }
 
-  /** Permitir solo fechas dentro del rango configurado */
   filtroFechasValidas = (fecha: Date | null): boolean => {
-    const maxPlazo = this.data?.restricciones?.max_dias_plazo ?? 0;
+    if (!fecha) return false;
 
-    if (maxPlazo === 0 || !fecha) {
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const fechaSeleccionada = new Date(fecha);
+    fechaSeleccionada.setHours(0, 0, 0, 0);
+
+    if (this.modoEdicion && this.solicitud?.fecha_inicio) {
+      const fOriginal = new Date(this.solicitud.fecha_inicio);
+      fOriginal.setHours(0, 0, 0, 0);
+      if (fechaSeleccionada.getTime() === fOriginal.getTime()) return true;
+    }
+
+    const aplicarDiasHabiles = this.restricciones?.dias_habiles ?? false;
+    if (aplicarDiasHabiles) {
+      const nroDiaSemana = fechaSeleccionada.getDay();
+      if (nroDiaSemana === 0 || nroDiaSemana === 6) return false;
+    }
+
+    const esFestivo = this.restricciones?.dias_no_permitidos?.some(
+      (f: any) =>
+        new Date(f).toDateString() === fechaSeleccionada.toDateString(),
+    );
+    if (esFestivo) return false;
+
+    const diaCierre = this.restricciones?.cierre_administrativo ?? 0;
+    let fechaInicioPlanilla: Date | null = null;
+
+    if (diaCierre > 0) {
+      if (diaCierre >= 30) {
+        fechaInicioPlanilla = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+
+        if (
+          hoy.getDate() > diaCierre &&
+          fechaSeleccionada.getMonth() === hoy.getMonth()
+        )
+          return false;
+      } else {
+        fechaInicioPlanilla =
+          hoy.getDate() <= diaCierre
+            ? new Date(hoy.getFullYear(), hoy.getMonth() - 1, diaCierre + 1)
+            : new Date(hoy.getFullYear(), hoy.getMonth(), diaCierre + 1);
+      }
+      if (fechaSeleccionada < fechaInicioPlanilla) return false;
+    }
+
+    const plz = this.restricciones?.max_dias_plazo ?? 0;
+    const ant = this.restricciones?.max_dias_anticipacion ?? 0;
+
+    if (plz === 0 && ant === 0) {
+      return this.estaEnRangoGestion(fechaSeleccionada);
+    }
+
+    if (plz > 0) {
+      const fechaMinimaPermitida =
+        this.restriccionService.obtenerFechaMinimaPermitida(
+          hoy,
+          plz,
+          this.restricciones,
+        );
+      const limiteRealAtras =
+        fechaInicioPlanilla && fechaMinimaPermitida < fechaInicioPlanilla
+          ? fechaInicioPlanilla
+          : fechaMinimaPermitida;
+      if (fechaSeleccionada < limiteRealAtras) return false;
+    } else if (plz < 0 && ant === 0) {
+      if (fechaSeleccionada < hoy) return false;
+    }
+
+    if (ant > 0) {
+      const fechaMinimaFutura =
+        this.restriccionService.obtenerFechaMinimaFutura(
+          hoy,
+          ant,
+          this.restricciones,
+        );
+      if (fechaSeleccionada < fechaMinimaFutura) return false;
+    } else if (ant < 0) {
+      const diasHaciaFuturo = Math.abs(ant);
+      const fechaMaximaFutura =
+        this.restriccionService.obtenerFechaMinimaFutura(
+          hoy,
+          diasHaciaFuturo,
+          this.restricciones,
+        );
+      if (fechaSeleccionada > fechaMaximaFutura) return false;
+    } else if (ant === 0 && plz > 0) {
+      if (fechaSeleccionada > hoy) return false;
+    } else if (ant === 0 && plz < 0) {
       return true;
     }
 
-    const hoy = new Date();
-
-    const fechaMin = new Date(hoy);
-    fechaMin.setDate(hoy.getDate() - maxPlazo);
-
-    const fechaMax = new Date(hoy);
-
-    return fecha ? fecha >= fechaMin && fecha <= fechaMax : false;
+    return this.estaEnRangoGestion(fechaSeleccionada);
   };
 
-  /** Validación de hora */
+  private estaEnRangoGestion(fecha: Date): boolean {
+    return fecha >= this.RangoMinFecha && fecha <= this.RangoMaxFecha;
+  }
+
   validateHoraRango(): void {
     if (this.horaInicio && this.horaFin) {
       this.horaRangoInvalido = this.horaInicio >= this.horaFin;
@@ -108,8 +192,7 @@ export class FormHoraComponent implements OnInit {
       !this.horaRangoInvalido &&
       this.fechaSalida &&
       this.horaInicio &&
-      this.horaFin &&
-      this.motivo
+      this.horaFin
     ) {
       const payload = {
         dias: [],
@@ -119,7 +202,7 @@ export class FormHoraComponent implements OnInit {
         fecha_fin: this.fechaSalida,
         hora_inicio: this.horaInicio,
         hora_fin: this.horaFin,
-        detalle: this.motivo,
+        detalle: this.descripcion,
         observacion: this.observacion,
         id_registro: this._idRegistro,
         id_contenido: this.data?._id,
@@ -155,7 +238,6 @@ export class FormHoraComponent implements OnInit {
       }
     }
   }
-
   obtenerEstadoConfirmado() {
     if (this.estado === 'DENEGADO') return 'DENEGADO';
     if (this._idAprobador === this.id_recursos_humanos) return 'PENDIENTE';

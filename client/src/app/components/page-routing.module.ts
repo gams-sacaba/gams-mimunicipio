@@ -4,12 +4,13 @@ import { SolicitudesComponent } from './pages/solicitudes/solicitudes.component'
 import { DatosComponent } from './pages/datos/datos.component';
 import { BandejaComponent } from './pages/bandeja/bandeja.component';
 import { HelpComponent } from './pages/help/help.component';
+import { RecursosComponent } from './pages/recursos/recursos.component';
 
 const routes: Routes = [
   { path: '', component: SolicitudesComponent },
   { path: 'bandeja', component: BandejaComponent },
-  //{ path: 'datos', component: DatosComponent },
   { path: 'solicitudes', component: SolicitudesComponent },
+  { path: 'recursos', component: RecursosComponent },
   { path: 'ayuda', component: HelpComponent },
 ];
 

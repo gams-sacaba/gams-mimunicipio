@@ -21,7 +21,6 @@ import { MAT_DATE_FORMATS } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 
-//Personalización de paginator en todos los módulos a español
 import { CustomPaginatorIntl } from './utils/paginator';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 
@@ -51,8 +50,9 @@ import { BandejaComponent } from './components/pages/bandeja/bandeja.component';
 import { FormHoraComponent } from './components/layout/form-hora/form-hora.component';
 import { HelpComponent } from './components/pages/help/help.component';
 import { ModalVideoComponent } from './components/content/modal-video/modal-video.component';
+import { RecursosComponent } from './components/pages/recursos/recursos.component';
+import { ValidadorQrComponent } from './components/validador-qr/validador-qr.component';
 
-// Define los formatos de fecha
 export const MY_DATE_FORMATS = {
   parse: {
     dateInput: 'DD/MM/YY',
@@ -87,6 +87,8 @@ export const MY_DATE_FORMATS = {
     FormHoraComponent,
     HelpComponent,
     ModalVideoComponent,
+    RecursosComponent,
+    ValidadorQrComponent,
   ],
   imports: [
     BrowserModule,

@@ -57,13 +57,14 @@
         <div *ngIf="data?.detalle">
             <mat-form-field appearance="outline" class="form-field mt-3" style="width: 100%;">
                 <mat-label>Motivo de la solicitud</mat-label>
-                <textarea matInput [(ngModel)]="motivo" maxlength="150" minlength="5"
-                    (input)="motivo = motivo.toUpperCase()" [disabled]="esDetalle"
+                <textarea matInput [(ngModel)]="descripcion" maxlength="150" minlength="5"
+                    (input)="descripcion = descripcion.toUpperCase()" [disabled]="esDetalle"
                     placeholder="Describe brevemente el motivo" required></textarea>
-                <mat-hint align="end">{{ motivo.length }}/150</mat-hint>
-                <mat-error *ngIf="motivo.length < 5">Debe tener al menos 5 caracteres.</mat-error>
+                <mat-hint align="end">{{ descripcion.length }}/150</mat-hint>
+                <mat-error *ngIf="descripcion.length < 5">Debe tener al menos 5 caracteres.</mat-error>
             </mat-form-field>
         </div>
+        <div *ngIf="!data?.detalle" style="height: 20px;"></div>
     </div>
 
     <div *ngIf="estado === 'RECHAZADO' || estado === 'DENEGADO' || (estado === 'REVISION' && esAprobador)">
@@ -74,7 +75,7 @@
                 [disabled]="(estado === 'RECHAZADO' || estado === 'DENEGADO') && !esAprobador" required></textarea>
             <mat-hint align="end">{{ observacion.length }}/150</mat-hint>
             <mat-error *ngIf="(estado === 'RECHAZADO' || estado === 'DENEGADO') && observacionInvalida()">
-                La observación es obligatoria cuando se deniega la solicitud.
+                La observación es obligatoria cuando la solicitud es denegada.
             </mat-error>
             <mat-error *ngIf="observacion.length < 5">Debe tener al menos 5 caracteres.</mat-error>
         </mat-form-field>
@@ -94,8 +95,8 @@
             !fechaSalida ||
             !horaInicio ||
             !horaFin ||
-            !motivo ||
-            horaRangoInvalido ||
+            horaRangoInvalido || 
+            (data?.detalle && (!descripcion || descripcion.length < 5)) ||
             fechaFueraDeRango() ||
             observacionInvalida()
           " *ngIf="esVista">

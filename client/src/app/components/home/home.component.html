@@ -35,6 +35,13 @@
                     </div>
                 </a>
 
+                <a mat-list-item routerLink="recursos" [class.active-link]="getActiveLink() === 'recursos'"
+                    (click)="setActiveLink('recursos')">
+                    <div class="icon">
+                        <mat-icon>folder_shared</mat-icon><span>Recursos</span>
+                    </div>
+                </a>
+
                 <mat-divider style="margin-top: 5px; margin-bottom: 5px;"></mat-divider>
 
                 <a mat-list-item routerLink="ayuda" [class.active-link]="getActiveLink() === 'ayuda'"

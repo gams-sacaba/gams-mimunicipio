@@ -21,43 +21,50 @@ th.mat-header-cell {
 }
 
 .estado {
-  border: 1px solid #ccc; /* Border for the square */
-  border-radius: 5px; /* Rounded corners */
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Shadow for a 3D effect */
-  width: 90px; /* Fixed width */
-  padding: 5px; /* Padding around text */
-  display: flex; /* Flexbox to center content */
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  width: 90px;
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
 }
 
 .estado-enviado {
   color: white;
-  background-color: #4ed8f0; /* Verde para enviado */
+  background-color: #17a2b8;
 }
 
 .estado-pendiente {
-  background-color: #f0ad4e; /* Amarillo para pendiente */
+  color: white;
+  background-color: #f39c12;
+}
+
+.estado-aprobado {
+  color: white;
+  background-color: #28a745;
 }
 
 .estado-rechazado {
   color: white;
-  background-color: #dc3545; /* Rojo para rechazado */
+  background-color: #dc3545;
 }
 
 .estado-denegado {
-  background-color: #6b0000; /* Quindo para denegado */
   color: white;
+  background-color: #800000;
 }
 
-.estado-aprobado {
-  background-color: #28a745; /* Verde para aprobado */
+.estado-anulado {
   color: white;
+  background-color: #343a40;
 }
 
 .estado-vencido {
-  background-color: #6c757d; /* Gris para vencido */
+  color: white;
+  background-color: #6c757d;
 }
 
 .trayectoria-wrapper {
@@ -77,7 +84,7 @@ th.mat-header-cell {
     height: 20px;
     cursor: help;
     transition: transform 0.2s ease;
-    color: #94a3b8; // Color base gris suave
+    color: #94a3b8;
 
     &:hover {
       transform: scale(1.2);
@@ -85,16 +92,16 @@ th.mat-header-cell {
 
     &.activo {
       color: #1e40af;
-    } // Azul fuerte
+    }
     &.aprobado {
       color: #10b981;
-    } // Esmeralda
+    }
     &.rechazado {
       color: #ef4444;
-    } // Rojo
+    }
     &.pendiente {
       color: #f59e0b;
-    } // Ámbar
+    }
   }
 
   .flecha-separador {
@@ -110,7 +117,6 @@ th.mat-header-cell {
   }
 }
 
-// Animación sutil para la flecha de pendiente
 @keyframes sideBySide {
   0%,
   100% {

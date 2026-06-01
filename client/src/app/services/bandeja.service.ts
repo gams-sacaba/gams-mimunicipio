@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { conexion } from '../../environments/environment.prod';
+import { conexion } from '../../environments/environment';
 
 const base_url = conexion.server.base_url + '/inbox';
 @Injectable({
@@ -29,6 +29,7 @@ export class BandejaService {
             return [];
           }
 
+          // console.error('Error al obtener elementos:', err);
           return of([]);
         }),
       );

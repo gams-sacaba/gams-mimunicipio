@@ -1,4 +1,9 @@
-export const environment = {
+export const conexion = {
   production: false,
-  base_url: "",
+  server: {
+    base_url: 'http://localhost:3330',
+  },
+  socket: {
+    base_url: 'http://localhost:3330',
+  },
 };

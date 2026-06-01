@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { PDFDocument, rgb } from 'pdf-lib';
-import * as fontkit from 'fontkit'; // Importamos fontkit
+import * as fontkit from 'fontkit';
 import { saveAs } from 'file-saver';
 
 @Injectable({
@@ -13,9 +13,8 @@ export class PdfService {
     datosGenerales: any,
     element: any,
     vacaciones: any,
-    reemplazo: any
+    reemplazo: any,
   ) {
-    //datos generales
     const nombres = datosGenerales.nombres || '';
     const apellidos = datosGenerales.apellidos || '';
     const ci = datosGenerales.ci || '';
@@ -25,9 +24,8 @@ export class PdfService {
     const unidad = datosGenerales.unidad || '';
     const dependencia = datosGenerales.dependencia || '';
 
-    //datos detalle
     const dias = element.dias.map((dia: any) => {
-      const fechaISO = dia.fecha.split('T')[0]; // "2025-04-01"
+      const fechaISO = dia.fecha.split('T')[0];
       const [anio, mes, diaNum] = fechaISO.split('-');
 
       const formato = `${diaNum}/${mes}/${anio}`;
@@ -54,7 +52,7 @@ export class PdfService {
             };
           })
         : [];
-    //console.log('gestionFormateada: ', vacaciones);
+
     const dias_solicitados = element.dias_totales || '';
     const fecha_actual =
       vacaciones.length > 0 ? vacaciones[0].gestionFormateada : '';
@@ -68,7 +66,6 @@ export class PdfService {
 
     const dias_disponibles = saldo_gestion_pasada + saldo_gestion_actual;
 
-    //datos reemplazo
     const nombresReemplazo = reemplazo.nombres || '';
     const apellidosReemplazo = reemplazo.apellidos || '';
     const cargoReemplazo = reemplazo.cargo || '';
@@ -84,35 +81,29 @@ export class PdfService {
     const squareSize = 15;
     const pdfDoc = await PDFDocument.create();
 
-    const cellHeight = 15; // Altura de cada celda (ajustar según necesidad)
+    const cellHeight = 15;
 
-    // Registra fontkit
-    pdfDoc.registerFontkit(fontkit); // Registra fontkit para usar fuentes personalizadas
+    pdfDoc.registerFontkit(fontkit);
 
-    // Cargar la fuente Verdana
     const verdanaBytes = await fetch('/assets/fonts/verdana.ttf').then((res) =>
-      res.arrayBuffer()
+      res.arrayBuffer(),
     );
     const verdanaFont = await pdfDoc.embedFont(verdanaBytes);
 
-    // Cargar la fuente Verdana Bold
     const verdanaBoldBytes = await fetch('/assets/fonts/verdana-bold.ttf').then(
-      (res) => res.arrayBuffer()
+      (res) => res.arrayBuffer(),
     );
     const verdanaBoldFont = await pdfDoc.embedFont(verdanaBoldBytes);
 
-    // Crear una página tamaño carta (21.59 cm x 27.94 cm)
-    const page = pdfDoc.addPage([595.28, 841.89]); // Tamaño Carta (595.28 x 841.89 puntos)
+    const page = pdfDoc.addPage([595.28, 841.89]);
 
-    const margin = 28.35; // 1 cm = 28.35 puntos
+    const margin = 28.35;
     const pageWidth = page.getWidth();
     const pageHeight = page.getHeight();
 
-    // Definir la altura de la fila y las columnas
     const rowHeight = 45;
-    const columnWidth = (pageWidth - 2 * margin) / 3; // Dividido en 3 columnas
+    const columnWidth = (pageWidth - 2 * margin) / 3;
 
-    // Dibujar la fila con borde
     page.drawRectangle({
       x: margin,
       y: pageHeight - margin - rowHeight,
@@ -120,15 +111,14 @@ export class PdfService {
       height: rowHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
-      color: rgb(1, 1, 1), // Fondo blanco
+      color: rgb(1, 1, 1),
     });
 
-    // Primera columna: Logo
     const logoBytes = await fetch('/assets/img/logo.png').then((res) =>
-      res.arrayBuffer()
+      res.arrayBuffer(),
     );
     const logoImage = await pdfDoc.embedPng(logoBytes);
-    const logoDims = logoImage.scale(0.1); // Redimensiona el logo si es necesario
+    const logoDims = logoImage.scale(0.1);
     page.drawImage(logoImage, {
       x: margin + 5,
       y: pageHeight - margin - rowHeight + 5,
@@ -136,23 +126,21 @@ export class PdfService {
       height: logoDims.height,
     });
 
-    // Segunda columna: Título "SOLICITUD DE VACACIONES" (centrado)
     const titleText = 'SOLICITUD DE VACACIONES';
     const titleHeight = verdanaBoldFont.heightAtSize(12);
     page.drawText(titleText, {
-      x: margin + columnWidth, // Centrado en la segunda columna
-      y: pageHeight - margin - rowHeight + (rowHeight - titleHeight) / 2, // Centrado en el eje Y
+      x: margin + columnWidth,
+      y: pageHeight - margin - rowHeight + (rowHeight - titleHeight) / 2,
       size: sizeTitle,
       font: verdanaBoldFont,
       color: rgb(0, 0, 0),
     });
 
-    // Tercera columna: "FOR-RH-001"
     const codeText = 'FOR-RH-001';
     const codeWidth = verdanaFont.widthOfTextAtSize(codeText, 8);
     page.drawText(codeText, {
-      x: margin + 2 * columnWidth + columnWidth - codeWidth - 30, // Alineado a la derecha en la tercera columna
-      y: pageHeight - margin - 15, // Parte superior de la celda
+      x: margin + 2 * columnWidth + columnWidth - codeWidth - 30,
+      y: pageHeight - margin - 15,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
@@ -161,21 +149,20 @@ export class PdfService {
     const codeDate = 'FECHA: ' + fechaSolicitud;
     const codeDateWith = verdanaFont.widthOfTextAtSize(codeDate, 8);
     page.drawText(codeDate, {
-      x: margin + 2 * columnWidth + columnWidth - codeDateWith, // Alineado a la derecha en la tercera columna
-      y: pageHeight - margin - 35, // Parte superior de la celda
+      x: margin + 2 * columnWidth + columnWidth - codeDateWith,
+      y: pageHeight - margin - 35,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    /******** DATOS GENERALES ENCABEZADO **********/
     const datosGeneralesRowY = pageHeight - margin - rowHeight - 14.7;
     const datosGeneralesRowWidth = pageWidth - 2 * margin;
 
     page.drawRectangle({
       x: margin,
       y: datosGeneralesRowY,
-      width: datosGeneralesRowWidth, // Usamos el mismo ancho total
+      width: datosGeneralesRowWidth,
       height: cellHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
@@ -184,7 +171,7 @@ export class PdfService {
     const datosGeneralesText = 'DATOS GENERALES';
     const datosGeneralesTextWidth = verdanaBoldFont.widthOfTextAtSize(
       datosGeneralesText,
-      9
+      9,
     );
 
     page.drawText(datosGeneralesText, {
@@ -195,30 +182,16 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    /********* 1° FILA PARA DATO GENERALES *********/
-    // Crear una nueva fila para los datos generales
     const rowDatosGeneralesY = datosGeneralesRowY - cellHeight;
 
-    // Definimos los anchos personalizados para cada columna (en puntos)
-    const columnWidths = [
-      45, // Nombres
-      110, // Valor de Nombres
-      46, // Apellidos
-      150, // Valor de Apellidos
-      25, // C.I.
-      64, // Valor de C.I.
-      45, // Teléfono
-      53.5, // Valor de Teléfono
-    ];
+    const columnWidths = [45, 110, 46, 150, 25, 64, 45, 53.5];
 
-    // Función para dibujar una celda con texto
     const drawCellWithText = (
       label: string,
       xPos: number,
       yPos: number,
-      cellWidth: number
+      cellWidth: number,
     ) => {
-      // Dibujar la celda con borde
       page.drawRectangle({
         x: xPos,
         y: yPos,
@@ -228,9 +201,8 @@ export class PdfService {
         borderWidth: 1,
       });
 
-      // Dibujar el texto centrado verticalmente
       page.drawText(label, {
-        x: xPos + 5, // Margen interno
+        x: xPos + 5,
         y: yPos + (cellHeight - sizeNormal) / 2,
         size: sizeNormal,
         font: verdanaFont,
@@ -238,12 +210,10 @@ export class PdfService {
       });
     };
 
-    // Posición X inicial
     let xPos = margin;
 
-    // Dibujar las 8 columnas con sus respectivos anchos personalizados
     drawCellWithText('Nombres:', xPos, rowDatosGeneralesY, columnWidths[0]);
-    xPos += columnWidths[0]; // Avanzar a la siguiente posición de celda
+    xPos += columnWidths[0];
 
     drawCellWithText(nombres, xPos, rowDatosGeneralesY, columnWidths[1]);
     xPos += columnWidths[1];
@@ -265,18 +235,10 @@ export class PdfService {
 
     drawCellWithText(telefono, xPos, rowDatosGeneralesY, columnWidths[7]);
 
-    /****************** 2° FILA PARA DATOS GENERALES ***************/
+    const rowCargoY = rowDatosGeneralesY - cellHeight;
 
-    // Definimos la posición Y para la nueva fila
-    const rowCargoY = rowDatosGeneralesY - cellHeight; // Debajo de la fila anterior
+    const columnWidthsCargo = [34, pageWidth - 2 * margin - 34];
 
-    // Definimos los anchos personalizados para las dos columnas
-    const columnWidthsCargo = [
-      34, // Ancho para "Cargo que desempeña:"
-      pageWidth - 2 * margin - 34, // Ancho restante para el valor de `this.cargo`
-    ];
-
-    // Dibujar la primera columna: "Cargo que desempeña:"
     page.drawRectangle({
       x: margin,
       y: rowCargoY,
@@ -287,14 +249,13 @@ export class PdfService {
     });
 
     page.drawText('Cargo:', {
-      x: margin + 5, // Margen interno
-      y: rowCargoY + (cellHeight - sizeNormal) / 2, // Centrado verticalmente
+      x: margin + 5,
+      y: rowCargoY + (cellHeight - sizeNormal) / 2,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la segunda columna: valor de `this.cargo`
     page.drawRectangle({
       x: margin + columnWidthsCargo[0],
       y: rowCargoY,
@@ -305,28 +266,24 @@ export class PdfService {
     });
 
     page.drawText(this.truncateText(cargo, 139), {
-      x: margin + columnWidthsCargo[0] + 5, // Margen interno en la segunda columna
-      y: rowCargoY + (cellHeight - sizeNormal) / 2, // Centrado verticalmente
+      x: margin + columnWidthsCargo[0] + 5,
+      y: rowCargoY + (cellHeight - sizeNormal) / 2,
       size: sizeMinimun,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    /****************** 3° FILA PARA DATOS GENERALES ***************/
-    // Definimos la posición Y para la nueva fila
-    const rowRegistroY = rowCargoY - cellHeight; // Justo debajo de la fila de "Cargo"
+    const rowRegistroY = rowCargoY - cellHeight;
 
-    // Definimos los anchos personalizados para las seis columnas
     const columnWidthsRegistro = [
-      41, // Ancho para "N° Item:"
-      33, // Ancho para `this.registro`
-      35, // Ancho para "Unidad:"
-      324, // Ancho para `this.unidad`
-      58, // Ancho para "Dependencia:"
-      pageWidth - 2 * margin - 491, // Ancho restante para `this.dependencia`
+      41,
+      33,
+      35,
+      324,
+      58,
+      pageWidth - 2 * margin - 491,
     ];
 
-    // Dibujar la primera columna: "N° Item:"
     page.drawRectangle({
       x: margin,
       y: rowRegistroY,
@@ -343,7 +300,6 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la segunda columna: `this.registro`
     page.drawRectangle({
       x: margin + columnWidthsRegistro[0],
       y: rowRegistroY,
@@ -360,7 +316,6 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la tercera columna: "Unidad:"
     page.drawRectangle({
       x: margin + columnWidthsRegistro[0] + columnWidthsRegistro[1],
       y: rowRegistroY,
@@ -377,7 +332,6 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la cuarta columna: `this.unidad`
     page.drawRectangle({
       x:
         margin +
@@ -403,7 +357,6 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la quinta columna: "Dependencia:"
     page.drawRectangle({
       x:
         margin +
@@ -431,7 +384,6 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la sexta columna: `this.dependencia`
     page.drawRectangle({
       x:
         margin +
@@ -461,40 +413,34 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    /****************** FILA PARA DETALLE******************** */
+    const detalleRowY = rowDatosGeneralesY - 45;
 
-    const detalleRowY = rowDatosGeneralesY - 45; // Debajo de la tabla
-    // Ancho total de la fila  (suma de todas las columnas)
     const detalleRowXWidth = pageWidth - 2 * margin;
 
-    // Dibujar la celda de "DETALLE"
     page.drawRectangle({
       x: margin,
       y: detalleRowY,
-      width: detalleRowXWidth, // Usamos el mismo ancho total
+      width: detalleRowXWidth,
       height: cellHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
     });
 
-    // Texto "DETALLE" centrado
     const detalleText = 'DETALLE';
     const detalleTextWidth = verdanaBoldFont.widthOfTextAtSize(detalleText, 9);
 
     page.drawText(detalleText, {
-      x: margin + (detalleRowXWidth - detalleTextWidth) / 2, // Centrado horizontalmente
-      y: detalleRowY + (cellHeight - 9) / 2 + 2, // Centrado verticalmente
+      x: margin + (detalleRowXWidth - detalleTextWidth) / 2,
+      y: detalleRowY + (cellHeight - 9) / 2 + 2,
       size: sizeNormal,
       font: verdanaBoldFont,
       color: rgb(0, 0, 0),
     });
 
-    // Cuarta fila: Encabezado de la tabla (7 columnas)
-    const row4Y = detalleRowY - 15; // Debajo de la fila de Cargo y N° registro
+    const row4Y = detalleRowY - 15;
 
-    const cellWidth = (pageWidth - 2 * margin) / 7; // Ancho dividido entre 7 columnas
+    const cellWidth = (pageWidth - 2 * margin) / 7;
 
-    // Dibujar encabezados de la tabla
     const headers = [
       'Fecha',
       'Jornada',
@@ -505,19 +451,18 @@ export class PdfService {
       'Turno',
     ];
     headers.forEach((header, index) => {
-      // Omitir la columna separadora (índice 3)
       if (index === 3) {
-        return; // Salir de esta iteración
+        return;
       }
       const xPos = margin + index * cellWidth;
       page.drawText(header, {
-        x: xPos + 2, // Un poco de margen dentro de la celda
-        y: row4Y + cellHeight - 10, // Ajustar para centrar en la celda
+        x: xPos + 2,
+        y: row4Y + cellHeight - 10,
         size: sizeMinimun,
         font: verdanaBoldFont,
         color: rgb(0, 0, 0),
       });
-      // Dibujar la celda del encabezado
+
       page.drawRectangle({
         x: xPos,
         y: row4Y,
@@ -528,30 +473,18 @@ export class PdfService {
       });
     });
 
-    // Dibujar las filas de datos (21 filas en total)
     for (let rowIndex = 0; rowIndex < 20; rowIndex++) {
       const rowY = row4Y - (rowIndex + 1) * cellHeight;
 
       for (let colIndex = 0; colIndex < 7; colIndex++) {
         const xPos = margin + colIndex * cellWidth;
 
-        // Columna separadora (colIndex 3) se mantiene vacía
         if (colIndex === 3) {
-          //   page.drawRectangle({
-          //     x: xPos,
-          //     y: rowY,
-          //     width: cellWidth,
-          //     height: cellHeight,
-          //     borderColor: rgb(0, 0, 0),
-          //     borderWidth: 1,
-          //   });
           continue;
         }
 
-        // Calcular el índice del elemento en `dias` para esta celda
-        const dataIndex = rowIndex + (colIndex < 4 ? 0 : 20); // Cambia a segunda mitad después de la fila 21
+        const dataIndex = rowIndex + (colIndex < 4 ? 0 : 20);
 
-        // Obtener el dato correspondiente
         const dia = dias[dataIndex];
         let text = '';
         if (dia) {
@@ -559,11 +492,10 @@ export class PdfService {
             colIndex % 3 === 0
               ? dia.fechaFormateada
               : colIndex % 3 === 1
-              ? dia.jornada
-              : dia.turno;
+                ? dia.jornada
+                : dia.turno;
         }
 
-        // Dibujar el texto
         page.drawText(text || '', {
           x: xPos + 2,
           y: rowY + cellHeight - 10,
@@ -572,7 +504,6 @@ export class PdfService {
           color: rgb(0, 0, 0),
         });
 
-        // Dibujar la celda
         page.drawRectangle({
           x: xPos,
           y: rowY,
@@ -584,64 +515,48 @@ export class PdfService {
       }
     }
 
-    // Nueva fila para "TOTAL DÍAS SOLICITADOS" y "Saldo Días Vacación al:"
-    const rowTotalDiasY = row4Y - 21 * cellHeight - 5; // Debajo de las 21 filas
+    const rowTotalDiasY = row4Y - 21 * cellHeight - 5;
 
-    // Dibujar la celda combinada para "TOTAL DÍAS SOLICITADOS:"
     page.drawRectangle({
       x: margin,
       y: rowTotalDiasY,
-      width: 3 * cellWidth, // Ancho combinado de las 3 primeras columnas
+      width: 3 * cellWidth,
       height: cellHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
     });
 
-    // Texto "TOTAL DÍAS SOLICITADOS:"
     const totalDiasText = `TOTAL DÍAS SOLICITADOS: `;
     const totalDiasTextWidth = verdanaBoldFont.widthOfTextAtSize(
       totalDiasText,
-      7
+      7,
     );
     page.drawText(totalDiasText, {
-      x: margin + (3 * cellWidth - totalDiasTextWidth) / 2 - 10, // Centrado
-      y: rowTotalDiasY + (cellHeight - 6) / 2, // Centrado verticalmente
-      size: sizeNormal,
-      font: verdanaBoldFont,
-      color: rgb(0, 0, 0),
-    });
-
-    // Texto del valor de `total_dias`
-    const totalDiasValue = `${dias_solicitados}`;
-    page.drawText(totalDiasValue, {
-      x: margin + 3 * cellWidth - totalDiasTextWidth + 40, // Alineado con separación
+      x: margin + (3 * cellWidth - totalDiasTextWidth) / 2 - 10,
       y: rowTotalDiasY + (cellHeight - 6) / 2,
       size: sizeNormal,
       font: verdanaBoldFont,
       color: rgb(0, 0, 0),
     });
 
-    // // Dibujar la celda separadora (columna 4)
-    // page.drawRectangle({
-    //   x: margin + 3 * cellWidth,
-    //   y: rowTotalDiasY,
-    //   width: cellWidth,
-    //   height: cellHeight,
-    //   borderColor: rgb(0, 0, 0),
-    //   borderWidth: 0,
-    // });
+    const totalDiasValue = `${dias_solicitados}`;
+    page.drawText(totalDiasValue, {
+      x: margin + 3 * cellWidth - totalDiasTextWidth + 40,
+      y: rowTotalDiasY + (cellHeight - 6) / 2,
+      size: sizeNormal,
+      font: verdanaBoldFont,
+      color: rgb(0, 0, 0),
+    });
 
-    // Dibujar la celda combinada para "Saldo Días Vacación al:"
     page.drawRectangle({
       x: margin + 4 * cellWidth,
       y: rowTotalDiasY,
-      width: 3 * cellWidth, // Ancho combinado de las columnas 5, 6 y 7
+      width: 3 * cellWidth,
       height: cellHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
     });
 
-    // Texto "Saldo Días Vacación al:"
     const saldoDiasText =
       vacaciones.length === 2
         ? `Saldo Días Vacación de ` + `${fecha_pasada}: ${saldo_gestion_pasada}`
@@ -649,124 +564,95 @@ export class PdfService {
 
     page.drawText(saldoDiasText, {
       x: margin + 4 * cellWidth + 5,
-      y: rowTotalDiasY + (cellHeight - 9) / 2, // Centrado verticalmente
+      y: rowTotalDiasY + (cellHeight - 9) / 2,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    // Fila 1: Solo se dibuja la columna 7
-    const rowSaldoY = rowTotalDiasY - cellHeight; // Justo debajo de la fila anterior
+    const rowSaldoY = rowTotalDiasY - cellHeight;
 
     page.drawRectangle({
-      x: margin + 4 * cellWidth, // Posición de la columna 7
+      x: margin + 4 * cellWidth,
       y: rowSaldoY,
-      width: 3 * cellWidth, // Ancho de la celda
-      height: cellHeight, // Altura de la celda
-      borderColor: rgb(0, 0, 0),
-      borderWidth: 1,
-    });
-
-    // Texto "Saldo Días Vacación al:" en la columna 7
-    const saldoDiasText_2 =
-      `Saldo Días Vacación de ` + `${fecha_actual}: ${saldo_gestion_actual}`;
-
-    page.drawText(saldoDiasText_2, {
-      x: margin + 4 * cellWidth + 5, // Espaciado dentro de la celda
-      y: rowSaldoY + (cellHeight - 9) / 2, // Centrado verticalmente
-      size: sizeNormal,
-      font: verdanaFont,
-      color: rgb(0, 0, 0),
-    });
-
-    // Fila 2: Solo se dibuja la columna 7
-    const rowTotalVacacionY = rowSaldoY - cellHeight; // Justo debajo de la fila anterior
-
-    page.drawRectangle({
-      x: margin + 4 * cellWidth, // Posición de la columna 7
-      y: rowTotalVacacionY,
-      width: 3 * cellWidth, // Ancho de la celda
-      height: cellHeight, // Altura de la celda
-      borderColor: rgb(0, 0, 0),
-      borderWidth: 1,
-    });
-
-    // Texto "Total días vacación:" en la columna 7
-    const totalVacacionText = `TOTAL DÍAS DISPONIBLES: ` + dias_disponibles;
-    const totalVacacionTextWidth = verdanaBoldFont.widthOfTextAtSize(
-      totalVacacionText,
-      9
-    );
-    page.drawText(totalVacacionText, {
-      x: margin + (12 * cellWidth - totalVacacionTextWidth) / 2 - 15, // Espaciado dentro de la celda
-      y: rowTotalVacacionY + (cellHeight - 6) / 2, // Centrado verticalmente
-      size: sizeNormal,
-      font: verdanaBoldFont,
-      color: rgb(0, 0, 0),
-    });
-
-    // Texto del valor de `total_dias` en la columna 7
-    // page.drawText(`${this.total_dias}`, {
-    //   x: margin + 6 * cellWidth + 5 + totalVacacionTextWidth + 5, // Alineado después del texto
-    //   y: rowTotalVacacionY + (cellHeight - 9) / 2,
-    //   size: 9,
-    //   font: verdanaFont,
-    //   color: rgb(0, 0, 0),
-    // });
-
-    /************* FILA "DETALLE DE PERSONAL DE REEMPLAZO"******** */
-    const detalleReemplazoRowY = rowTotalVacacionY - 20; // Debajo de la tabla
-    // Ancho total de la fila  (suma de todas las columnas)
-    const detalleRowWidth = pageWidth - 2 * margin;
-
-    // Dibujar la celda de "DETALLE DE PERSONAL DE REEMPLAZO"
-    page.drawRectangle({
-      x: margin,
-      y: detalleReemplazoRowY,
-      width: detalleRowWidth, // Usamos el mismo ancho total
+      width: 3 * cellWidth,
       height: cellHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
     });
 
-    // Texto "DETALLE DE PERSONAL DE REEMPLAZO" centrado
-    const detalleReemplazoText = 'PERSONAL DE REEMPLAZO';
-    const detalleReemplazoTextWidth = verdanaBoldFont.widthOfTextAtSize(
-      detalleReemplazoText,
-      9
-    );
+    const saldoDiasText_2 =
+      `Saldo Días Vacación de ` + `${fecha_actual}: ${saldo_gestion_actual}`;
 
-    page.drawText(detalleReemplazoText, {
-      x: margin + (detalleRowWidth - detalleReemplazoTextWidth) / 2, // Centrado horizontalmente
-      y: detalleReemplazoRowY + (cellHeight - 9) / 2 + 2, // Centrado verticalmente
+    page.drawText(saldoDiasText_2, {
+      x: margin + 4 * cellWidth + 5,
+      y: rowSaldoY + (cellHeight - 9) / 2,
+      size: sizeNormal,
+      font: verdanaFont,
+      color: rgb(0, 0, 0),
+    });
+
+    const rowTotalVacacionY = rowSaldoY - cellHeight;
+
+    page.drawRectangle({
+      x: margin + 4 * cellWidth,
+      y: rowTotalVacacionY,
+      width: 3 * cellWidth,
+      height: cellHeight,
+      borderColor: rgb(0, 0, 0),
+      borderWidth: 1,
+    });
+
+    const totalVacacionText = `TOTAL DÍAS DISPONIBLES: ` + dias_disponibles;
+    const totalVacacionTextWidth = verdanaBoldFont.widthOfTextAtSize(
+      totalVacacionText,
+      9,
+    );
+    page.drawText(totalVacacionText, {
+      x: margin + (12 * cellWidth - totalVacacionTextWidth) / 2 - 15,
+      y: rowTotalVacacionY + (cellHeight - 6) / 2,
       size: sizeNormal,
       font: verdanaBoldFont,
       color: rgb(0, 0, 0),
     });
 
-    /********** 1° FILA "DETALLE DE PERSONAL DE REEMPLAZO"**********/
+    const detalleReemplazoRowY = rowTotalVacacionY - 20;
+
+    const detalleRowWidth = pageWidth - 2 * margin;
+
+    page.drawRectangle({
+      x: margin,
+      y: detalleReemplazoRowY,
+      width: detalleRowWidth,
+      height: cellHeight,
+      borderColor: rgb(0, 0, 0),
+      borderWidth: 1,
+    });
+
+    const detalleReemplazoText = 'PERSONAL DE REEMPLAZO';
+    const detalleReemplazoTextWidth = verdanaBoldFont.widthOfTextAtSize(
+      detalleReemplazoText,
+      9,
+    );
+
+    page.drawText(detalleReemplazoText, {
+      x: margin + (detalleRowWidth - detalleReemplazoTextWidth) / 2,
+      y: detalleReemplazoRowY + (cellHeight - 9) / 2 + 2,
+      size: sizeNormal,
+      font: verdanaBoldFont,
+      color: rgb(0, 0, 0),
+    });
+
     const rowReemplazoY = detalleReemplazoRowY - cellHeight;
 
-    // Definimos los anchos personalizados para cada columna (en puntos)
-    const columnWidthsReemplazo = [
-      45, // Nombres
-      110, // Valor de Nombres
-      46, // Apellidos
-      150, // Valor de Apellidos
-      25, // C.I.
-      64, // Valor de C.I.
-      45, // Teléfono
-      53.5, // Valor de Teléfono
-    ];
+    const columnWidthsReemplazo = [45, 110, 46, 150, 25, 64, 45, 53.5];
 
-    // Función para dibujar una celda con texto
     const drawCellWithTextReemplazo = (
       label: string,
       xPosR: number,
       yPosR: number,
-      cellWidth: number
+      cellWidth: number,
     ) => {
-      // Dibujar la celda con borde
       page.drawRectangle({
         x: xPosR,
         y: yPosR,
@@ -776,9 +662,8 @@ export class PdfService {
         borderWidth: 1,
       });
 
-      // Dibujar el texto centrado verticalmente
       page.drawText(label, {
-        x: xPosR + 5, // Margen interno
+        x: xPosR + 5,
         y: yPosR + (cellHeight - sizeNormal) / 2,
         size: sizeNormal,
         font: verdanaFont,
@@ -786,23 +671,21 @@ export class PdfService {
       });
     };
 
-    // Posición X inicial
     let xPosR = margin;
 
-    // Dibujar las 8 columnas con sus respectivos anchos personalizados
     drawCellWithTextReemplazo(
       'Nombres:',
       xPosR,
       rowReemplazoY,
-      columnWidthsReemplazo[0]
+      columnWidthsReemplazo[0],
     );
-    xPosR += columnWidthsReemplazo[0]; // Avanzar a la siguiente posición de celda
+    xPosR += columnWidthsReemplazo[0];
 
     drawCellWithTextReemplazo(
       nombresReemplazo,
       xPosR,
       rowReemplazoY,
-      columnWidthsReemplazo[1]
+      columnWidthsReemplazo[1],
     );
     xPosR += columnWidthsReemplazo[1];
 
@@ -810,7 +693,7 @@ export class PdfService {
       'Apellidos:',
       xPosR,
       rowReemplazoY,
-      columnWidthsReemplazo[2]
+      columnWidthsReemplazo[2],
     );
     xPosR += columnWidthsReemplazo[2];
 
@@ -818,7 +701,7 @@ export class PdfService {
       apellidosReemplazo,
       xPosR,
       rowReemplazoY,
-      columnWidthsReemplazo[3]
+      columnWidthsReemplazo[3],
     );
     xPosR += columnWidthsReemplazo[3];
 
@@ -826,7 +709,7 @@ export class PdfService {
       'C.I.:',
       xPosR,
       rowReemplazoY,
-      columnWidthsReemplazo[4]
+      columnWidthsReemplazo[4],
     );
     xPosR += columnWidthsReemplazo[4];
 
@@ -834,7 +717,7 @@ export class PdfService {
       ciReemplazo,
       xPosR,
       rowReemplazoY,
-      columnWidthsReemplazo[5]
+      columnWidthsReemplazo[5],
     );
     xPosR += columnWidthsReemplazo[5];
 
@@ -842,7 +725,7 @@ export class PdfService {
       'Teléfono:',
       xPosR,
       rowReemplazoY,
-      columnWidthsReemplazo[6]
+      columnWidthsReemplazo[6],
     );
     xPosR += columnWidthsReemplazo[6];
 
@@ -850,21 +733,13 @@ export class PdfService {
       telefonoReemplazo,
       xPosR,
       rowReemplazoY,
-      columnWidthsReemplazo[7]
+      columnWidthsReemplazo[7],
     );
 
-    /*********** 2° FILA "DETALLE DE PERSONAL DE REEMPLAZO"*******/
+    const rowCargoDetalleY = rowReemplazoY - cellHeight;
 
-    // Definimos la posición Y para la nueva fila
-    const rowCargoDetalleY = rowReemplazoY - cellHeight; // Debajo de la fila anterior
+    const columnWidthsCargoDetalle = [34, pageWidth - 2 * margin - 34];
 
-    // Definimos los anchos personalizados para las dos columnas
-    const columnWidthsCargoDetalle = [
-      34, // Ancho para "Cargo que desempeña:"
-      pageWidth - 2 * margin - 34, // Ancho restante para el valor de `this.cargo`
-    ];
-
-    // Dibujar la primera columna: "Cargo que desempeña:"
     page.drawRectangle({
       x: margin,
       y: rowCargoDetalleY,
@@ -875,14 +750,13 @@ export class PdfService {
     });
 
     page.drawText('Cargo:', {
-      x: margin + 5, // Margen interno
-      y: rowCargoDetalleY + (cellHeight - sizeNormal) / 2, // Centrado verticalmente
+      x: margin + 5,
+      y: rowCargoDetalleY + (cellHeight - sizeNormal) / 2,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la segunda columna: valor de `this.cargo`
     page.drawRectangle({
       x: margin + columnWidthsCargoDetalle[0],
       y: rowCargoDetalleY,
@@ -893,19 +767,17 @@ export class PdfService {
     });
 
     page.drawText(this.truncateText(cargoReemplazo, 139), {
-      x: margin + columnWidthsCargoDetalle[0] + 5, // Margen interno en la segunda columna
-      y: rowCargoDetalleY + (cellHeight - sizeNormal) / 2, // Centrado verticalmente
+      x: margin + columnWidthsCargoDetalle[0] + 5,
+      y: rowCargoDetalleY + (cellHeight - sizeNormal) / 2,
       size: sizeMinimun,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    /********** FILA PARA SOLICITANTE Y JEFE ********** */
     const rowFirmasY = rowCargoDetalleY - cellHeight;
-    // Ancho de cada columna (mitad del ancho total)
+
     const firmaColumnWidth = detalleRowWidth / 2;
 
-    // Dibujar la celda para "Solicitante"
     page.drawRectangle({
       x: margin,
       y: rowFirmasY,
@@ -915,21 +787,19 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Texto "Solicitante" centrado
     const solicitanteText = 'Solicitante';
     const solicitanteTextWidth = verdanaBoldFont.widthOfTextAtSize(
       solicitanteText,
-      9
+      9,
     );
     page.drawText(solicitanteText, {
-      x: margin + (firmaColumnWidth - solicitanteTextWidth) / 2, // Centrado horizontalmente
-      y: rowFirmasY + (cellHeight - 9) / 2 + 2, // Centrado verticalmente
+      x: margin + (firmaColumnWidth - solicitanteTextWidth) / 2,
+      y: rowFirmasY + (cellHeight - 9) / 2 + 2,
       size: sizeNormal,
       font: verdanaBoldFont,
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la celda para "Jefe Inmediato Superior"
     page.drawRectangle({
       x: margin + firmaColumnWidth,
       y: rowFirmasY,
@@ -939,21 +809,18 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Texto "Jefe Inmediato Superior" centrado
     const jefeText = 'Jefe Inmediato Superior';
     const jefeTextWidth = verdanaBoldFont.widthOfTextAtSize(jefeText, 9);
     page.drawText(jefeText, {
-      x: margin + firmaColumnWidth + (firmaColumnWidth - jefeTextWidth) / 2, // Centrado horizontalmente
-      y: rowFirmasY + (cellHeight - 9) / 2 + 2, // Centrado verticalmente
+      x: margin + firmaColumnWidth + (firmaColumnWidth - jefeTextWidth) / 2,
+      y: rowFirmasY + (cellHeight - 9) / 2 + 2,
       size: sizeNormal,
       font: verdanaBoldFont,
       color: rgb(0, 0, 0),
     });
 
-    // Fila debajo de "Solicitante" y "Jefe Inmediato Superior"
-    const rowFechaY = rowFirmasY - cellHeight; // Justo debajo de la fila anterior
+    const rowFechaY = rowFirmasY - cellHeight;
 
-    // Dibujar la celda para "Fecha de Solicitud"
     page.drawRectangle({
       x: margin,
       y: rowFechaY,
@@ -963,7 +830,6 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Texto "Fecha de Solicitud:"
     const fechaSolicitudLabel = 'Fecha de Solicitud: ';
     page.drawText(fechaSolicitudLabel, {
       x: margin + 5,
@@ -973,10 +839,9 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    // Cuadrado para "Fecha de Solicitud"
     const fechaSolicitudLabelWidth = verdanaFont.widthOfTextAtSize(
       fechaSolicitudLabel,
-      9
+      9,
     );
     page.drawRectangle({
       x: margin + 5 + fechaSolicitudLabelWidth + 2,
@@ -994,7 +859,6 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la celda para "Fecha de Aprobación"
     page.drawRectangle({
       x: margin + firmaColumnWidth,
       y: rowFechaY,
@@ -1004,7 +868,6 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Texto "Fecha de Aprobación:"
     const fechaAprobacionLabel = 'Fecha de Aprobación: ';
     const aprobacionX = margin + firmaColumnWidth + 5;
     page.drawText(fechaAprobacionLabel, {
@@ -1015,10 +878,9 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    // Cuadrado para "Fecha de Aprobación"
     const fechaAprobacionLabelWidth = verdanaFont.widthOfTextAtSize(
       fechaAprobacionLabel,
-      9
+      9,
     );
     page.drawRectangle({
       x: aprobacionX + fechaAprobacionLabelWidth + 2,
@@ -1036,10 +898,8 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    // Fila debajo de "Fecha de Solicitud" y "Fecha de Aprobación"
-    const rowFirmasFinalY = rowFechaY - cellHeight; // Justo debajo de la fila anterior
+    const rowFirmasFinalY = rowFechaY - cellHeight;
 
-    // Dibujar la celda para "Firma del Solicitante"
     page.drawRectangle({
       x: margin,
       y: rowFirmasFinalY,
@@ -1049,21 +909,19 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Texto "Firma del Solicitante" centrado
     const firmaSolicitanteText = 'Firma del Solicitante';
     const firmaSolicitanteTextWidth = verdanaFont.widthOfTextAtSize(
       firmaSolicitanteText,
-      9
+      9,
     );
     page.drawText(firmaSolicitanteText, {
-      x: margin + (firmaColumnWidth - firmaSolicitanteTextWidth) / 2, // Centrado horizontalmente
-      y: rowFirmasFinalY + (cellHeight - 9) / 2, // Centrado verticalmente
+      x: margin + (firmaColumnWidth - firmaSolicitanteTextWidth) / 2,
+      y: rowFirmasFinalY + (cellHeight - 9) / 2,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la celda para "Firma de Aprobación"
     page.drawRectangle({
       x: margin + firmaColumnWidth,
       y: rowFirmasFinalY,
@@ -1073,27 +931,24 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Texto "Firma de Aprobación" centrado
     const firmaAprobacionText = 'Firma de Aprobación';
     const firmaAprobacionTextWidth = verdanaFont.widthOfTextAtSize(
       firmaAprobacionText,
-      9
+      9,
     );
     page.drawText(firmaAprobacionText, {
       x:
         margin +
         firmaColumnWidth +
-        (firmaColumnWidth - firmaAprobacionTextWidth) / 2, // Centrado horizontalmente
-      y: rowFirmasFinalY + (cellHeight - 9) / 2, // Centrado verticalmente
+        (firmaColumnWidth - firmaAprobacionTextWidth) / 2,
+      y: rowFirmasFinalY + (cellHeight - 9) / 2,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    // Fila vacía debajo de "Firma de Aprobación"
-    const rowNuevaFilaY = rowFirmasFinalY - cellHeight - 70; // Justo debajo de la fila anterior
+    const rowNuevaFilaY = rowFirmasFinalY - cellHeight - 70;
 
-    // Dibujar la celda vacía para la primera columna
     page.drawRectangle({
       x: margin,
       y: rowNuevaFilaY,
@@ -1103,7 +958,6 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Dibujar la celda vacía para la segunda columna
     page.drawRectangle({
       x: margin + firmaColumnWidth,
       y: rowNuevaFilaY,
@@ -1113,16 +967,12 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Guardamos el PDF
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
     saveAs(blob, 'solicitud_de_vacaciones.pdf');
   }
 
   async generateExcepcion(datosGenerales: any, element: any, contrato: any) {
-    //datos generales
-    // console.log('datosGenerales: ', datosGenerales);
-    // console.log('element: ', element);
     let nombres = datosGenerales.nombres || '';
     let apellidos = datosGenerales.apellidos || '';
     let ci = datosGenerales.ci || '';
@@ -1148,35 +998,29 @@ export class PdfService {
     let squareSize = 15;
     let pdfDoc = await PDFDocument.create();
 
-    let cellHeight = 15; // Altura de cada celda (ajustar según necesidad)
+    let cellHeight = 15;
 
-    // Registra fontkit
-    pdfDoc.registerFontkit(fontkit); // Registra fontkit para usar fuentes personalizadas
+    pdfDoc.registerFontkit(fontkit);
 
-    // Cargar la fuente Verdana
     let verdanaBytes = await fetch('/assets/fonts/verdana.ttf').then((res) =>
-      res.arrayBuffer()
+      res.arrayBuffer(),
     );
     let verdanaFont = await pdfDoc.embedFont(verdanaBytes);
 
-    // Cargar la fuente Verdana Bold
     let verdanaBoldBytes = await fetch('/assets/fonts/verdana-bold.ttf').then(
-      (res) => res.arrayBuffer()
+      (res) => res.arrayBuffer(),
     );
     let verdanaBoldFont = await pdfDoc.embedFont(verdanaBoldBytes);
 
-    // Crear una página tamaño carta (21.59 cm x 27.94 cm)
-    let page = pdfDoc.addPage([595.28, 841.89]); // Tamaño Carta (595.28 x 841.89 puntos)
+    let page = pdfDoc.addPage([595.28, 841.89]);
 
-    let margin = 28.35; // 1 cm = 28.35 puntos
+    let margin = 28.35;
     let pageWidth = page.getWidth();
     let pageHeight = page.getHeight();
 
-    // Definir la altura de la fila y las columnas
     let rowHeight = 45;
-    let columnWidth = (pageWidth - 2 * margin) / 3; // Dividido en 3 columnas
+    let columnWidth = (pageWidth - 2 * margin) / 3;
 
-    // Dibujar la fila con borde
     page.drawRectangle({
       x: margin,
       y: pageHeight - margin - rowHeight,
@@ -1184,15 +1028,14 @@ export class PdfService {
       height: rowHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
-      color: rgb(1, 1, 1), // Fondo blanco
+      color: rgb(1, 1, 1),
     });
 
-    // Primera columna: Logo
     let logoBytes = await fetch('/assets/img/logo.png').then((res) =>
-      res.arrayBuffer()
+      res.arrayBuffer(),
     );
     let logoImage = await pdfDoc.embedPng(logoBytes);
-    let logoDims = logoImage.scale(0.1); // Redimensiona el logo si es necesario
+    let logoDims = logoImage.scale(0.1);
     page.drawImage(logoImage, {
       x: margin + 5,
       y: pageHeight - margin - rowHeight + 5,
@@ -1200,22 +1043,20 @@ export class PdfService {
       height: logoDims.height,
     });
 
-    // Segunda columna: Título (centrado)
     let titleHeight = verdanaBoldFont.heightAtSize(12);
     page.drawText(titleText, {
-      x: margin + columnWidth - 40, // Centrado en la segunda columna
-      y: pageHeight - margin - rowHeight + (rowHeight - titleHeight) / 2, // Centrado en el eje Y
+      x: margin + columnWidth - 40,
+      y: pageHeight - margin - rowHeight + (rowHeight - titleHeight) / 2,
       size: sizeTitle,
       font: verdanaBoldFont,
       color: rgb(0, 0, 0),
     });
 
-    // Tercera columna: "FOR-RH-001"
     let codeText = 'Form SAC003';
     let codeWidth = verdanaFont.widthOfTextAtSize(codeText, 8);
     page.drawText(codeText, {
-      x: margin + 2 * columnWidth + columnWidth - codeWidth - 26.5, // Alineado a la derecha en la tercera columna
-      y: pageHeight - margin - 15, // Parte superior de la celda
+      x: margin + 2 * columnWidth + columnWidth - codeWidth - 26.5,
+      y: pageHeight - margin - 15,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
@@ -1224,21 +1065,20 @@ export class PdfService {
     let codeDate = 'FECHA: ' + fechaSolicitud;
     let codeDateWith = verdanaFont.widthOfTextAtSize(codeDate, 8);
     page.drawText(codeDate, {
-      x: margin + 2 * columnWidth + columnWidth - codeDateWith, // Alineado a la derecha en la tercera columna
-      y: pageHeight - margin - 35, // Parte superior de la celda
+      x: margin + 2 * columnWidth + columnWidth - codeDateWith,
+      y: pageHeight - margin - 35,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    /******** DATOS GENERALES ENCABEZADO **********/
     let datosGeneralesRowY = pageHeight - margin - rowHeight - 14.7;
     let datosGeneralesRowWidth = pageWidth - 2 * margin;
 
     page.drawRectangle({
       x: margin,
       y: datosGeneralesRowY,
-      width: datosGeneralesRowWidth, // Usamos el mismo ancho total
+      width: datosGeneralesRowWidth,
       height: cellHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
@@ -1247,7 +1087,7 @@ export class PdfService {
     let datosGeneralesText = 'DATOS GENERALES';
     let datosGeneralesTextWidth = verdanaBoldFont.widthOfTextAtSize(
       datosGeneralesText,
-      9
+      9,
     );
 
     page.drawText(datosGeneralesText, {
@@ -1258,30 +1098,16 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    /********* 1° FILA PARA DATO GENERALES *********/
-    // Crear una nueva fila para los datos generales
     let rowDatosGeneralesY = datosGeneralesRowY - cellHeight;
 
-    // Definimos los anchos personalizados para cada columna (en puntos)
-    let columnWidths = [
-      45, // Nombres
-      110, // Valor de Nombres
-      46, // Apellidos
-      150, // Valor de Apellidos
-      25, // C.I.
-      64, // Valor de C.I.
-      45, // Teléfono
-      53.5, // Valor de Teléfono
-    ];
+    let columnWidths = [45, 110, 46, 150, 25, 64, 45, 53.5];
 
-    // Función para dibujar una celda con texto
     let drawCellWithText = (
       label: string,
       xPos: number,
       yPos: number,
-      cellWidth: number
+      cellWidth: number,
     ) => {
-      // Dibujar la celda con borde
       page.drawRectangle({
         x: xPos,
         y: yPos,
@@ -1291,9 +1117,8 @@ export class PdfService {
         borderWidth: 1,
       });
 
-      // Dibujar el texto centrado verticalmente
       page.drawText(label, {
-        x: xPos + 5, // Margen interno
+        x: xPos + 5,
         y: yPos + (cellHeight - sizeNormal) / 2,
         size: sizeNormal,
         font: verdanaFont,
@@ -1301,12 +1126,10 @@ export class PdfService {
       });
     };
 
-    // Posición X inicial
     let xPos = margin;
 
-    // Dibujar las 8 columnas con sus respectivos anchos personalizados
     drawCellWithText('Nombres:', xPos, rowDatosGeneralesY, columnWidths[0]);
-    xPos += columnWidths[0]; // Avanzar a la siguiente posición de celda
+    xPos += columnWidths[0];
 
     drawCellWithText(nombres, xPos, rowDatosGeneralesY, columnWidths[1]);
     xPos += columnWidths[1];
@@ -1328,18 +1151,10 @@ export class PdfService {
 
     drawCellWithText(telefono, xPos, rowDatosGeneralesY, columnWidths[7]);
 
-    /****************** 2° FILA PARA DATOS GENERALES ***************/
+    let rowCargoY = rowDatosGeneralesY - cellHeight;
 
-    // Definimos la posición Y para la nueva fila
-    let rowCargoY = rowDatosGeneralesY - cellHeight; // Debajo de la fila anterior
+    let columnWidthsCargo = [34, pageWidth - 2 * margin - 34];
 
-    // Definimos los anchos personalizados para las dos columnas
-    let columnWidthsCargo = [
-      34, // Ancho para "Cargo que desempeña:"
-      pageWidth - 2 * margin - 34, // Ancho restante para el valor de `this.cargo`
-    ];
-
-    // Dibujar la primera columna: "Cargo que desempeña:"
     page.drawRectangle({
       x: margin,
       y: rowCargoY,
@@ -1350,14 +1165,13 @@ export class PdfService {
     });
 
     page.drawText('Cargo:', {
-      x: margin + 5, // Margen interno
-      y: rowCargoY + (cellHeight - sizeNormal) / 2, // Centrado verticalmente
+      x: margin + 5,
+      y: rowCargoY + (cellHeight - sizeNormal) / 2,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la segunda columna: valor de `this.cargo`
     page.drawRectangle({
       x: margin + columnWidthsCargo[0],
       y: rowCargoY,
@@ -1368,28 +1182,24 @@ export class PdfService {
     });
 
     page.drawText(this.truncateText(cargo, 139), {
-      x: margin + columnWidthsCargo[0] + 5, // Margen interno en la segunda columna
-      y: rowCargoY + (cellHeight - sizeNormal) / 2, // Centrado verticalmente
+      x: margin + columnWidthsCargo[0] + 5,
+      y: rowCargoY + (cellHeight - sizeNormal) / 2,
       size: sizeMinimun,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    /****************** 3° FILA PARA DATOS GENERALES ***************/
-    // Definimos la posición Y para la nueva fila
-    let rowRegistroY = rowCargoY - cellHeight; // Justo debajo de la fila de "Cargo"
+    let rowRegistroY = rowCargoY - cellHeight;
 
-    // Definimos los anchos personalizados para las seis columnas
     let columnWidthsRegistro = [
-      55, // Ancho para "N° Item:"
-      33, // Ancho para `this.registro`
-      35, // Ancho para "Unidad:"
-      310, // Ancho para `this.unidad`
-      58, // Ancho para "Dependencia:"
-      pageWidth - 2 * margin - 491, // Ancho restante para `this.dependencia`
+      55,
+      33,
+      35,
+      310,
+      58,
+      pageWidth - 2 * margin - 491,
     ];
 
-    // Dibujar la primera columna: "N° Item:"
     page.drawRectangle({
       x: margin,
       y: rowRegistroY,
@@ -1406,7 +1216,6 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la segunda columna: `this.registro`
     page.drawRectangle({
       x: margin + columnWidthsRegistro[0],
       y: rowRegistroY,
@@ -1423,7 +1232,6 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la tercera columna: "Unidad:"
     page.drawRectangle({
       x: margin + columnWidthsRegistro[0] + columnWidthsRegistro[1],
       y: rowRegistroY,
@@ -1440,7 +1248,6 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la cuarta columna: `this.unidad`
     page.drawRectangle({
       x:
         margin +
@@ -1466,7 +1273,6 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la quinta columna: "Dependencia:"
     page.drawRectangle({
       x:
         margin +
@@ -1494,7 +1300,6 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la sexta columna: `this.dependencia`
     page.drawRectangle({
       x:
         margin +
@@ -1524,58 +1329,50 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    /****************** FILA PARA DETALLE******************** */
+    let detalleRowY = rowDatosGeneralesY - 45;
 
-    let detalleRowY = rowDatosGeneralesY - 45; // Debajo de la tabla
-    // Ancho total de la fila  (suma de todas las columnas)
     let detalleRowXWidth = pageWidth - 2 * margin;
 
-    // Dibujar la celda de "DETALLE"
     page.drawRectangle({
       x: margin,
       y: detalleRowY,
-      width: detalleRowXWidth, // Usamos el mismo ancho total
+      width: detalleRowXWidth,
       height: cellHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
     });
 
-    // Texto "DETALLE" centrado
     let detalleText = 'SALIDA';
     let detalleTextWidth = verdanaBoldFont.widthOfTextAtSize(detalleText, 9);
 
     page.drawText(detalleText, {
-      x: margin + (detalleRowXWidth - detalleTextWidth) / 2, // Centrado horizontalmente
-      y: detalleRowY + (cellHeight - 9) / 2 + 2, // Centrado verticalmente
+      x: margin + (detalleRowXWidth - detalleTextWidth) / 2,
+      y: detalleRowY + (cellHeight - 9) / 2 + 2,
       size: sizeNormal,
       font: verdanaBoldFont,
       color: rgb(0, 0, 0),
     });
 
-    // Cuarta fila: Encabezado de la tabla (7 columnas)
-    let row4Y = detalleRowY - 15; // Debajo de la fila de Cargo y N° registro
+    let row4Y = detalleRowY - 15;
 
-    let cellWidth = (pageWidth - 2 * margin) / 7; // Ancho dividido entre 7 columnas
+    let cellWidth = (pageWidth - 2 * margin) / 7;
 
-    // Nueva fila para "TOTAL DÍAS SOLICITADOS" y "Saldo Días Vacación al:"
-    let rowTotalDiasY = row4Y - 21; // Debajo de las 21 filas
+    let rowTotalDiasY = row4Y - 21;
 
-    // Dibujar la celda combinada para "SELLO"
     page.drawRectangle({
       x: margin,
       y: rowTotalDiasY - 76,
-      width: 3 * cellWidth, // Ancho combinado de las 3 primeras columnas
+      width: 3 * cellWidth,
       height: cellHeight * 7 + 3,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
     });
 
-    // Texto "SELLO DEL LUGAR VISITADO "
     let totalDiasText = `SELLO DEL LUGAR VISITADO`;
     let totalDiasTextWidth = verdanaFont.widthOfTextAtSize(totalDiasText, 7);
     page.drawText(totalDiasText, {
-      x: margin + cellWidth - 4, // Centrado
-      y: rowTotalDiasY - 20, // Centrado verticalmente
+      x: margin + cellWidth - 4,
+      y: rowTotalDiasY - 20,
       size: sizeMinimun,
       font: verdanaFont,
       color: rgb(0, 0, 0),
@@ -1584,7 +1381,7 @@ export class PdfService {
     page.drawRectangle({
       x: margin + 3 * cellWidth + 3,
       y: rowTotalDiasY + 17.5,
-      width: 1 * cellWidth - 9, // Ancho combinado de las columnas 5, 6 y 7
+      width: 1 * cellWidth - 9,
       height: cellHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
@@ -1594,7 +1391,7 @@ export class PdfService {
 
     page.drawText(fechaTitulo, {
       x: margin + 3 * cellWidth + 8,
-      y: rowTotalDiasY + 21.5, // Centrado verticalmente
+      y: rowTotalDiasY + 21.5,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
@@ -1602,7 +1399,7 @@ export class PdfService {
 
     page.drawText(fechaSalida, {
       x: margin + 3 * cellWidth + 75,
-      y: rowTotalDiasY + 21.5, // Centrado verticalmente
+      y: rowTotalDiasY + 21.5,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
@@ -1611,7 +1408,7 @@ export class PdfService {
     page.drawRectangle({
       x: margin + 3 * cellWidth + 125,
       y: rowTotalDiasY + 17.5,
-      width: 65, // Ancho combinado de las columnas 5, 6 y 7
+      width: 65,
       height: cellHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
@@ -1621,7 +1418,7 @@ export class PdfService {
 
     page.drawText(horaTitulo, {
       x: margin + 3 * cellWidth + 129,
-      y: rowTotalDiasY + 21.5, // Centrado verticalmente
+      y: rowTotalDiasY + 21.5,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
@@ -1636,52 +1433,46 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Texto "Saldo Días Vacación al:"
     let saldoDiasText = `De hrs.: ${horaInicio}   A hrs.: ${horaFin}`;
 
     page.drawText(saldoDiasText, {
       x: margin + 5 * cellWidth + 40,
-      y: rowTotalDiasY + 21.5, // Centrado verticalmente
+      y: rowTotalDiasY + 21.5,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    // Fila 1: Solo se dibuja la columna 7
-    let rowSaldoY = rowTotalDiasY - cellHeight; // Justo debajo de la fila anterior
+    let rowSaldoY = rowTotalDiasY - cellHeight;
 
     page.drawRectangle({
-      x: margin + 3 * cellWidth + 3, // Posición de la columna 7
+      x: margin + 3 * cellWidth + 3,
       y: rowSaldoY + 17.5 - 3,
-      width: 4 * cellWidth - 3, // Ancho de la celda
-      height: cellHeight, // Altura de la celda
+      width: 4 * cellWidth - 3,
+      height: cellHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
     });
 
-    // Texto "Saldo Días Vacación al:" en la columna 7
     let saldoDiasText_2 = `Motivo`;
 
     page.drawText(saldoDiasText_2, {
-      x: margin + 4 * cellWidth + 61, // Espaciado dentro de la celda
-      y: rowSaldoY + 19, // Centrado verticalmente
+      x: margin + 4 * cellWidth + 61,
+      y: rowSaldoY + 19,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    // Fila 2: Solo se dibuja la columna 7
-    let rowTotalVacacionY = rowSaldoY - cellHeight; // Justo debajo de la fila anterior
+    let rowTotalVacacionY = rowSaldoY - cellHeight;
 
-    // Parámetros del rectángulo
-    let rectX = margin + 3 * cellWidth + 3; // Posición X
-    let rectY = rowTotalVacacionY - 46.5; // Posición Y
-    let rectWidth = 4 * cellWidth - 3; // Ancho del rectángulo
-    let rectHeight = cellHeight * 4 + 16; // Altura del rectángulo
-    let lineHeight = 10; // Altura de cada línea de texto
-    let padding = 5; // Espaciado dentro del rectángulo
+    let rectX = margin + 3 * cellWidth + 3;
+    let rectY = rowTotalVacacionY - 46.5;
+    let rectWidth = 4 * cellWidth - 3;
+    let rectHeight = cellHeight * 4 + 16;
+    let lineHeight = 10;
+    let padding = 5;
 
-    // Dibujar el rectángulo
     page.drawRectangle({
       x: rectX,
       y: rectY,
@@ -1691,7 +1482,6 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Dividir el texto en líneas
     let textLines: string[] = [];
     let remainingText = detalle;
 
@@ -1707,8 +1497,7 @@ export class PdfService {
       remainingText = remainingText.slice(i);
     }
 
-    // Dibujar las líneas de texto
-    let currentY = rectY + rectHeight - lineHeight - padding; // Coordenada Y inicial
+    let currentY = rectY + rectHeight - lineHeight - padding;
     textLines.forEach((line) => {
       if (currentY > rectY + padding) {
         page.drawText(line, {
@@ -1718,35 +1507,24 @@ export class PdfService {
           font: verdanaFont,
           color: rgb(0, 0, 0),
         });
-        currentY -= lineHeight; // Moverse a la siguiente línea
+        currentY -= lineHeight;
       }
     });
 
-    /************* FILA "DETALLE DE PERSONAL DE REEMPLAZO"******** */
-    let detalleReemplazoRowY = rowTotalVacacionY - 20; // Debajo de la tabla
-    // Ancho total de la fila  (suma de todas las columnas)
+    let detalleReemplazoRowY = rowTotalVacacionY - 20;
+
     let detalleRowWidth = pageWidth - 2 * margin;
 
-    /********** 1° FILA "DETALLE DE PERSONAL DE REEMPLAZO"**********/
     let rowReemplazoY = detalleReemplazoRowY - cellHeight;
 
-    /*********** 2° FILA "DETALLE DE PERSONAL DE REEMPLAZO"*******/
+    let rowCargoDetalleY = rowReemplazoY - cellHeight;
 
-    // Definimos la posición Y para la nueva fila
-    let rowCargoDetalleY = rowReemplazoY - cellHeight; // Debajo de la fila anterior
+    let columnWidthsCargoDetalle = [34, pageWidth - 2 * margin - 34];
 
-    // Definimos los anchos personalizados para las dos columnas
-    let columnWidthsCargoDetalle = [
-      34, // Ancho para "Cargo que desempeña:"
-      pageWidth - 2 * margin - 34, // Ancho restante para el valor de `this.cargo`
-    ];
-
-    /********** FILA PARA SOLICITANTE Y JEFE ********** */
     let rowFirmasY = rowCargoDetalleY - cellHeight;
-    // Ancho de cada columna (dividido en tres partes iguales)
+
     let firmaColumnWidth = detalleRowWidth / 3;
 
-    // Dibujar la celda para "Solicitante"
     page.drawRectangle({
       x: margin,
       y: rowFirmasY,
@@ -1756,21 +1534,19 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Texto "Solicitante" centrado
     let solicitanteText = 'Solicitante';
     let solicitanteTextWidth = verdanaBoldFont.widthOfTextAtSize(
       solicitanteText,
-      9
+      9,
     );
     page.drawText(solicitanteText, {
-      x: margin + (firmaColumnWidth - solicitanteTextWidth) / 2 + 5, // Centrado horizontalmente
-      y: rowFirmasY + (cellHeight - 9) / 2 + 2, // Centrado verticalmente
+      x: margin + (firmaColumnWidth - solicitanteTextWidth) / 2 + 5,
+      y: rowFirmasY + (cellHeight - 9) / 2 + 2,
       size: sizeNormal,
       font: verdanaBoldFont,
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la celda para "Jefe Inmediato Superior"
     page.drawRectangle({
       x: margin + firmaColumnWidth,
       y: rowFirmasY,
@@ -1780,19 +1556,17 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Texto "Jefe Inmediato Superior" centrado
     let jefeText = 'Inmediato Superior';
     let jefeTextWidth = verdanaBoldFont.widthOfTextAtSize(jefeText, 9);
     page.drawText(jefeText, {
       x:
-        margin + firmaColumnWidth + (firmaColumnWidth - jefeTextWidth) / 2 + 10, // Centrado horizontalmente
-      y: rowFirmasY + (cellHeight - 9) / 2 + 2, // Centrado verticalmente
+        margin + firmaColumnWidth + (firmaColumnWidth - jefeTextWidth) / 2 + 10,
+      y: rowFirmasY + (cellHeight - 9) / 2 + 2,
       size: sizeNormal,
       font: verdanaBoldFont,
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la celda para "Dirección Adm. y RRHH"
     page.drawRectangle({
       x: margin + 2 * firmaColumnWidth,
       y: rowFirmasY,
@@ -1802,28 +1576,25 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Texto "Dirección Adm. y RRHH" centrado
     let direccionText = 'Dirección Adm. y RRHH';
     let direccionTextWidth = verdanaBoldFont.widthOfTextAtSize(
       direccionText,
-      9
+      9,
     );
     page.drawText(direccionText, {
       x:
         margin +
         2 * firmaColumnWidth +
         (firmaColumnWidth - direccionTextWidth) / 2 +
-        10, // Centrado horizontalmente
-      y: rowFirmasY + (cellHeight - 9) / 2 + 2, // Centrado verticalmente
+        10,
+      y: rowFirmasY + (cellHeight - 9) / 2 + 2,
       size: sizeNormal,
       font: verdanaBoldFont,
       color: rgb(0, 0, 0),
     });
 
-    // Fila vacía debajo de las tres columnas
-    let rowNuevaFilaY = rowFirmasY - cellHeight - 70; // Justo debajo de la fila anterior
+    let rowNuevaFilaY = rowFirmasY - cellHeight - 70;
 
-    // Dibujar la celda vacía para la primera columna
     page.drawRectangle({
       x: margin,
       y: rowNuevaFilaY,
@@ -1833,7 +1604,6 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Dibujar la celda vacía para la segunda columna
     page.drawRectangle({
       x: margin + firmaColumnWidth,
       y: rowNuevaFilaY,
@@ -1843,7 +1613,6 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Dibujar la celda vacía para la tercera columna
     page.drawRectangle({
       x: margin + 2 * firmaColumnWidth,
       y: rowNuevaFilaY,
@@ -1853,7 +1622,6 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Divisor de página
     page.drawRectangle({
       x: 0,
       y: pageHeight / 2,
@@ -1864,29 +1632,25 @@ export class PdfService {
     });
 
     page.drawText(note, {
-      x: margin + 10, // Alineado a la derecha en la tercera columna
-      y: rowNuevaFilaY - 15, // Parte superior de la celda
+      x: margin + 10,
+      y: rowNuevaFilaY - 15,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
     page.drawText(noteContinuos, {
-      x: margin + 37, // Alineado a la derecha en la tercera columna
-      y: rowNuevaFilaY - 25, // Parte superior de la celda
+      x: margin + 37,
+      y: rowNuevaFilaY - 25,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    /********************************
-     *  !!! IMPORTANTE COPIA REPLICA !!!
-     * *********************************/
-
     let midPageY = pageHeight / 2;
 
     let secondPageRowY = pageHeight - margin - rowHeight - midPageY;
-    // Dibujar la fila con borde
+
     page.drawRectangle({
       x: margin,
       y: secondPageRowY,
@@ -1894,10 +1658,9 @@ export class PdfService {
       height: rowHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
-      color: rgb(1, 1, 1), // Fondo blanco
+      color: rgb(1, 1, 1),
     });
 
-    // Primera columna: Logo
     page.drawImage(logoImage, {
       x: margin + 5,
       y: secondPageRowY + 5,
@@ -1905,43 +1668,37 @@ export class PdfService {
       height: logoDims.height,
     });
 
-    // Segunda columna: Título "SOLICITUD DE EXCEPCIÓN DE TICKEO" (centrado)
-
     page.drawText(titleText, {
-      x: margin + columnWidth - 40, // Centrado en la segunda columna
-      y: secondPageRowY + (rowHeight - titleHeight) / 2, // Centrado en el eje Y
+      x: margin + columnWidth - 40,
+      y: secondPageRowY + (rowHeight - titleHeight) / 2,
       size: sizeTitle,
       font: verdanaBoldFont,
       color: rgb(0, 0, 0),
     });
 
-    // Tercera columna: "FOR-RH-001"
     let nameForm = pageHeight - margin - midPageY;
     page.drawText(codeText, {
-      x: margin + 2 * columnWidth + columnWidth - codeWidth - 26.5, // Alineado a la derecha en la tercera columna
-      y: nameForm - 15, // Parte superior de la celda
+      x: margin + 2 * columnWidth + columnWidth - codeWidth - 26.5,
+      y: nameForm - 15,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    // Cuarta columna; fecha
     page.drawText(codeDate, {
-      x: margin + 2 * columnWidth + columnWidth - codeDateWith, // Alineado a la derecha en la tercera columna
-      y: nameForm - 35, // Parte superior de la celda
+      x: margin + 2 * columnWidth + columnWidth - codeDateWith,
+      y: nameForm - 35,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    //     /******** DATOS GENERALES ENCABEZADO **********/
     datosGeneralesRowY = pageHeight - margin - rowHeight - 14.7 - midPageY;
-    //      datosGeneralesRowWidth = pageWidth - 2 * margin;
 
     page.drawRectangle({
       x: margin,
       y: datosGeneralesRowY,
-      width: datosGeneralesRowWidth, // Usamos el mismo ancho total
+      width: datosGeneralesRowWidth,
       height: cellHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
@@ -1955,18 +1712,14 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    //     /********* 1° FILA PARA DATO GENERALES *********/
-    //     // Crear una nueva fila para los datos generales
     rowDatosGeneralesY = datosGeneralesRowY - cellHeight;
 
-    // Función para dibujar una celda con texto
     drawCellWithText = (
       label: string,
       xPos: number,
       yPos: number,
-      cellWidth: number
+      cellWidth: number,
     ) => {
-      // Dibujar la celda con borde
       page.drawRectangle({
         x: xPos,
         y: yPos,
@@ -1976,9 +1729,8 @@ export class PdfService {
         borderWidth: 1,
       });
 
-      // Dibujar el texto centrado verticalmente
       page.drawText(label, {
-        x: xPos + 5, // Margen interno
+        x: xPos + 5,
         y: yPos + (cellHeight - sizeNormal) / 2,
         size: sizeNormal,
         font: verdanaFont,
@@ -1986,12 +1738,10 @@ export class PdfService {
       });
     };
 
-    //     // Posición X inicial
     xPos = margin;
 
-    //     // Dibujar las 8 columnas con sus respectivos anchos personalizados
     drawCellWithText('Nombres:', xPos, rowDatosGeneralesY, columnWidths[0]);
-    xPos += columnWidths[0]; // Avanzar a la siguiente posición de celda
+    xPos += columnWidths[0];
 
     drawCellWithText(nombres, xPos, rowDatosGeneralesY, columnWidths[1]);
     xPos += columnWidths[1];
@@ -2013,12 +1763,8 @@ export class PdfService {
 
     drawCellWithText(telefono, xPos, rowDatosGeneralesY, columnWidths[7]);
 
-    //     /****************** 2° FILA PARA DATOS GENERALES ***************/
+    rowCargoY = rowDatosGeneralesY - cellHeight;
 
-    //     // Definimos la posición Y para la nueva fila
-    rowCargoY = rowDatosGeneralesY - cellHeight; // Debajo de la fila anterior
-
-    //     // Dibujar la primera columna: "Cargo que desempeña:"
     page.drawRectangle({
       x: margin,
       y: rowCargoY,
@@ -2029,14 +1775,13 @@ export class PdfService {
     });
 
     page.drawText('Cargo:', {
-      x: margin + 5, // Margen interno
-      y: rowCargoY + (cellHeight - sizeNormal) / 2, // Centrado verticalmente
+      x: margin + 5,
+      y: rowCargoY + (cellHeight - sizeNormal) / 2,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    //     // Dibujar la segunda columna: valor de `this.cargo`
     page.drawRectangle({
       x: margin + columnWidthsCargo[0],
       y: rowCargoY,
@@ -2047,18 +1792,15 @@ export class PdfService {
     });
 
     page.drawText(this.truncateText(cargo, 139), {
-      x: margin + columnWidthsCargo[0] + 5, // Margen interno en la segunda columna
-      y: rowCargoY + (cellHeight - sizeNormal) / 2, // Centrado verticalmente
+      x: margin + columnWidthsCargo[0] + 5,
+      y: rowCargoY + (cellHeight - sizeNormal) / 2,
       size: sizeMinimun,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    //     /****************** 3° FILA PARA DATOS GENERALES ***************/
-    //     // Definimos la posición Y para la nueva fila
-    rowRegistroY = rowCargoY - cellHeight; // Justo debajo de la fila de "Cargo"
+    rowRegistroY = rowCargoY - cellHeight;
 
-    //     // Dibujar la primera columna: "N° Item:"
     page.drawRectangle({
       x: margin,
       y: rowRegistroY,
@@ -2075,7 +1817,6 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    //     // Dibujar la segunda columna: `this.registro`
     page.drawRectangle({
       x: margin + columnWidthsRegistro[0],
       y: rowRegistroY,
@@ -2092,7 +1833,6 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    //     // Dibujar la tercera columna: "Unidad:"
     page.drawRectangle({
       x: margin + columnWidthsRegistro[0] + columnWidthsRegistro[1],
       y: rowRegistroY,
@@ -2109,7 +1849,6 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    //     // Dibujar la cuarta columna: `this.unidad`
     page.drawRectangle({
       x:
         margin +
@@ -2135,7 +1874,6 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    //     // Dibujar la quinta columna: "Dependencia:"
     page.drawRectangle({
       x:
         margin +
@@ -2163,7 +1901,6 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    //     // Dibujar la sexta columna: `this.dependencia`
     page.drawRectangle({
       x:
         margin +
@@ -2193,52 +1930,41 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    //     /****************** FILA PARA DETALLE******************** */
+    detalleRowY = rowDatosGeneralesY - 45;
 
-    detalleRowY = rowDatosGeneralesY - 45; // Debajo de la tabla
-    //     // Ancho total de la fila  (suma de todas las columnas)
-    //      detalleRowXWidth = pageWidth - 2 * margin;
-
-    //     // Dibujar la celda de "DETALLE"
     page.drawRectangle({
       x: margin,
       y: detalleRowY,
-      width: detalleRowXWidth, // Usamos el mismo ancho total
+      width: detalleRowXWidth,
       height: cellHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
     });
 
     page.drawText(detalleText, {
-      x: margin + (detalleRowXWidth - detalleTextWidth) / 2, // Centrado horizontalmente
-      y: detalleRowY + (cellHeight - 9) / 2 + 2, // Centrado verticalmente
+      x: margin + (detalleRowXWidth - detalleTextWidth) / 2,
+      y: detalleRowY + (cellHeight - 9) / 2 + 2,
       size: sizeNormal,
       font: verdanaBoldFont,
       color: rgb(0, 0, 0),
     });
 
-    //     // Cuarta fila: Encabezado de la tabla (7 columnas)
-    row4Y = detalleRowY - 15; // Debajo de la fila de Cargo y N° registro
+    row4Y = detalleRowY - 15;
 
-    //      cellWidth = (pageWidth - 2 * margin) / 7; // Ancho dividido entre 7 columnas
+    rowTotalDiasY = row4Y - 21;
 
-    //     // Nueva fila para "TOTAL DÍAS SOLICITADOS" y "Saldo Días Vacación al:"
-    rowTotalDiasY = row4Y - 21; // Debajo de las 21 filas
-
-    //     // Dibujar la celda combinada para "SELLO"
     page.drawRectangle({
       x: margin,
       y: rowTotalDiasY - 76,
-      width: 3 * cellWidth, // Ancho combinado de las 3 primeras columnas
+      width: 3 * cellWidth,
       height: cellHeight * 7 + 3,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
     });
 
-    //     // Texto "SELLO DEL LUGAR VISITADO "
     page.drawText(totalDiasText, {
-      x: margin + cellWidth - 4, // Centrado
-      y: rowTotalDiasY - 20, // Centrado verticalmente
+      x: margin + cellWidth - 4,
+      y: rowTotalDiasY - 20,
       size: sizeMinimun,
       font: verdanaFont,
       color: rgb(0, 0, 0),
@@ -2247,17 +1973,15 @@ export class PdfService {
     page.drawRectangle({
       x: margin + 3 * cellWidth + 3,
       y: rowTotalDiasY + 17.5,
-      width: 1 * cellWidth - 9, // Ancho combinado de las columnas 5, 6 y 7
+      width: 1 * cellWidth - 9,
       height: cellHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
     });
 
-    //      `Fecha de Salida:`;
-
     page.drawText(fechaTitulo, {
       x: margin + 3 * cellWidth + 8,
-      y: rowTotalDiasY + 21.5, // Centrado verticalmente
+      y: rowTotalDiasY + 21.5,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
@@ -2265,7 +1989,7 @@ export class PdfService {
 
     page.drawText(fechaSalida, {
       x: margin + 3 * cellWidth + 75,
-      y: rowTotalDiasY + 21.5, // Centrado verticalmente
+      y: rowTotalDiasY + 21.5,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
@@ -2274,17 +1998,15 @@ export class PdfService {
     page.drawRectangle({
       x: margin + 3 * cellWidth + 125,
       y: rowTotalDiasY + 17.5,
-      width: 65, // Ancho combinado de las columnas 5, 6 y 7
+      width: 65,
       height: cellHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
     });
 
-    //     `Hora Excepción:`;
-
     page.drawText(horaTitulo, {
       x: margin + 3 * cellWidth + 129,
-      y: rowTotalDiasY + 21.5, // Centrado verticalmente
+      y: rowTotalDiasY + 21.5,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
@@ -2301,45 +2023,40 @@ export class PdfService {
 
     page.drawText(saldoDiasText, {
       x: margin + 5 * cellWidth + 40,
-      y: rowTotalDiasY + 21.5, // Centrado verticalmente
+      y: rowTotalDiasY + 21.5,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    //     // Fila 1: Solo se dibuja la columna 7
-    rowSaldoY = rowTotalDiasY - cellHeight; // Justo debajo de la fila anterior
+    rowSaldoY = rowTotalDiasY - cellHeight;
 
     page.drawRectangle({
-      x: margin + 3 * cellWidth + 3, // Posición de la columna 7
+      x: margin + 3 * cellWidth + 3,
       y: rowSaldoY + 17.5 - 3,
-      width: 4 * cellWidth - 3, // Ancho de la celda
-      height: cellHeight, // Altura de la celda
+      width: 4 * cellWidth - 3,
+      height: cellHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
     });
 
-    // Texto  columna 7
-
     page.drawText(saldoDiasText_2, {
-      x: margin + 4 * cellWidth + 61, // Espaciado dentro de la celda
-      y: rowSaldoY + 19, // Centrado verticalmente
+      x: margin + 4 * cellWidth + 61,
+      y: rowSaldoY + 19,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    //     // Fila 2: Solo se dibuja la columna 7
-    rowTotalVacacionY = rowSaldoY - cellHeight; // Justo debajo de la fila anterior
+    rowTotalVacacionY = rowSaldoY - cellHeight;
 
-    rectX = margin + 3 * cellWidth + 3; // Posición X
-    rectY = rowTotalVacacionY - 46.5; // Posición Y
-    rectWidth = 4 * cellWidth - 3; // Ancho del rectángulo
-    rectHeight = cellHeight * 4 + 16; // Altura del rectángulo
-    lineHeight = 10; // Altura de cada línea de texto
-    padding = 5; // Espaciado dentro del rectángulo
+    rectX = margin + 3 * cellWidth + 3;
+    rectY = rowTotalVacacionY - 46.5;
+    rectWidth = 4 * cellWidth - 3;
+    rectHeight = cellHeight * 4 + 16;
+    lineHeight = 10;
+    padding = 5;
 
-    // // Dibujar el rectángulo
     page.drawRectangle({
       x: rectX,
       y: rectY,
@@ -2349,7 +2066,6 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // // Dividir el texto en líneas
     textLines = [];
     remainingText = detalle;
 
@@ -2365,8 +2081,7 @@ export class PdfService {
       remainingText = remainingText.slice(i);
     }
 
-    // // Dibujar las líneas de texto
-    currentY = rectY + rectHeight - lineHeight - padding; // Coordenada Y inicial
+    currentY = rectY + rectHeight - lineHeight - padding;
     textLines.forEach((line) => {
       if (currentY > rectY + padding) {
         page.drawText(line, {
@@ -2376,35 +2091,24 @@ export class PdfService {
           font: verdanaFont,
           color: rgb(0, 0, 0),
         });
-        currentY -= lineHeight; // Moverse a la siguiente línea
+        currentY -= lineHeight;
       }
     });
 
-    //     /************* FILA "DETALLE DE PERSONAL DE REEMPLAZO"******** */
-    detalleReemplazoRowY = rowTotalVacacionY - 20; // Debajo de la tabla
-    //     // Ancho total de la fila  (suma de todas las columnas)
+    detalleReemplazoRowY = rowTotalVacacionY - 20;
+
     detalleRowWidth = pageWidth - 2 * margin;
 
-    //     /********** 1° FILA "DETALLE DE PERSONAL DE REEMPLAZO"**********/
     rowReemplazoY = detalleReemplazoRowY - cellHeight;
 
-    //     /*********** 2° FILA "DETALLE DE PERSONAL DE REEMPLAZO"*******/
+    rowCargoDetalleY = rowReemplazoY - cellHeight;
 
-    //     // Definimos la posición Y para la nueva fila
-    rowCargoDetalleY = rowReemplazoY - cellHeight; // Debajo de la fila anterior
+    columnWidthsCargoDetalle = [34, pageWidth - 2 * margin - 34];
 
-    //     // Definimos los anchos personalizados para las dos columnas
-    columnWidthsCargoDetalle = [
-      34, // Ancho para "Cargo que desempeña:"
-      pageWidth - 2 * margin - 34, // Ancho restante para el valor de `this.cargo`
-    ];
-
-    //     /********** FILA PARA SOLICITANTE Y JEFE ********** */
     rowFirmasY = rowCargoDetalleY - cellHeight;
-    //     // Ancho de cada columna (dividido en tres partes iguales)
+
     firmaColumnWidth = detalleRowWidth / 3;
 
-    // Dibujar la celda para "Solicitante"
     page.drawRectangle({
       x: margin,
       y: rowFirmasY,
@@ -2414,17 +2118,14 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    //     // Texto "Solicitante" centrado
-
     page.drawText(solicitanteText, {
-      x: margin + (firmaColumnWidth - solicitanteTextWidth) / 2 + 5, // Centrado horizontalmente
-      y: rowFirmasY + (cellHeight - 9) / 2 + 2, // Centrado verticalmente
+      x: margin + (firmaColumnWidth - solicitanteTextWidth) / 2 + 5,
+      y: rowFirmasY + (cellHeight - 9) / 2 + 2,
       size: sizeNormal,
       font: verdanaBoldFont,
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la celda para "Jefe Inmediato Superior"
     page.drawRectangle({
       x: margin + firmaColumnWidth,
       y: rowFirmasY,
@@ -2434,17 +2135,15 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Texto "Jefe Inmediato Superior" centrado
     page.drawText(jefeText, {
       x:
-        margin + firmaColumnWidth + (firmaColumnWidth - jefeTextWidth) / 2 + 10, // Centrado horizontalmente
-      y: rowFirmasY + (cellHeight - 9) / 2 + 2, // Centrado verticalmente
+        margin + firmaColumnWidth + (firmaColumnWidth - jefeTextWidth) / 2 + 10,
+      y: rowFirmasY + (cellHeight - 9) / 2 + 2,
       size: sizeNormal,
       font: verdanaBoldFont,
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la celda para "Dirección Adm. y RRHH"
     page.drawRectangle({
       x: margin + 2 * firmaColumnWidth,
       y: rowFirmasY,
@@ -2454,23 +2153,20 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Texto "Dirección Adm. y RRHH" centrado
     page.drawText(direccionText, {
       x:
         margin +
         2 * firmaColumnWidth +
         (firmaColumnWidth - direccionTextWidth) / 2 +
-        10, // Centrado horizontalmente
-      y: rowFirmasY + (cellHeight - 9) / 2 + 2, // Centrado verticalmente
+        10,
+      y: rowFirmasY + (cellHeight - 9) / 2 + 2,
       size: sizeNormal,
       font: verdanaBoldFont,
       color: rgb(0, 0, 0),
     });
 
-    // Fila vacía debajo de las tres columnas
-    rowNuevaFilaY = rowFirmasY - cellHeight - 70; // Justo debajo de la fila anterior
+    rowNuevaFilaY = rowFirmasY - cellHeight - 70;
 
-    // Dibujar la celda vacía para la primera columna
     page.drawRectangle({
       x: margin,
       y: rowNuevaFilaY,
@@ -2480,7 +2176,6 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Dibujar la celda vacía para la segunda columna
     page.drawRectangle({
       x: margin + firmaColumnWidth,
       y: rowNuevaFilaY,
@@ -2490,7 +2185,6 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Dibujar la celda vacía para la tercera columna
     page.drawRectangle({
       x: margin + 2 * firmaColumnWidth,
       y: rowNuevaFilaY,
@@ -2501,30 +2195,27 @@ export class PdfService {
     });
 
     page.drawText(note, {
-      x: margin + 10, // Alineado a la derecha en la tercera columna
-      y: rowNuevaFilaY - 15, // Parte superior de la celda
+      x: margin + 10,
+      y: rowNuevaFilaY - 15,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
     page.drawText(noteContinuos, {
-      x: margin + 37, // Alineado a la derecha en la tercera columna
-      y: rowNuevaFilaY - 25, // Parte superior de la celda
+      x: margin + 37,
+      y: rowNuevaFilaY - 25,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    // Guardamos el PDF
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
     saveAs(blob, 'solicitud_de_excepcion.pdf');
   }
 
   async generatePermiso(datosGenerales: any, element: any, contrato: any) {
-    // console.log('datosGenerales: ', datosGenerales);
-    // console.log('element: ', element);
     let nombres = datosGenerales.nombres || '';
     let apellidos = datosGenerales.apellidos || '';
     let ci = datosGenerales.ci || '';
@@ -2543,9 +2234,8 @@ export class PdfService {
 
     const dias_solicitados = element.dias_totales || '';
 
-    //datos detalle
     const dias = element.dias.map((dia: any) => {
-      const fechaISO = dia.fecha.split('T')[0]; // "2025-04-01"
+      const fechaISO = dia.fecha.split('T')[0];
       const [anio, mes, diaNum] = fechaISO.split('-');
 
       const formato = `${diaNum}/${mes}/${anio}`;
@@ -2562,35 +2252,29 @@ export class PdfService {
     let squareSize = 15;
     let pdfDoc = await PDFDocument.create();
 
-    let cellHeight = 15; // Altura de cada celda (ajustar según necesidad)
+    let cellHeight = 15;
 
-    // Registra fontkit
-    pdfDoc.registerFontkit(fontkit); // Registra fontkit para usar fuentes personalizadas
+    pdfDoc.registerFontkit(fontkit);
 
-    // Cargar la fuente Verdana
     let verdanaBytes = await fetch('/assets/fonts/verdana.ttf').then((res) =>
-      res.arrayBuffer()
+      res.arrayBuffer(),
     );
     let verdanaFont = await pdfDoc.embedFont(verdanaBytes);
 
-    // Cargar la fuente Verdana Bold
     let verdanaBoldBytes = await fetch('/assets/fonts/verdana-bold.ttf').then(
-      (res) => res.arrayBuffer()
+      (res) => res.arrayBuffer(),
     );
     let verdanaBoldFont = await pdfDoc.embedFont(verdanaBoldBytes);
 
-    // Crear una página tamaño carta (21.59 cm x 27.94 cm)
-    let page = pdfDoc.addPage([595.28, 841.89]); // Tamaño Carta (595.28 x 841.89 puntos)
+    let page = pdfDoc.addPage([595.28, 841.89]);
 
-    let margin = 28.35; // 1 cm = 28.35 puntos
+    let margin = 28.35;
     let pageWidth = page.getWidth();
     let pageHeight = page.getHeight();
 
-    // Definir la altura de la fila y las columnas
     let rowHeight = 45;
-    let columnWidth = (pageWidth - 2 * margin) / 3; // Dividido en 3 columnas
+    let columnWidth = (pageWidth - 2 * margin) / 3;
 
-    // Dibujar la fila con borde
     page.drawRectangle({
       x: margin,
       y: pageHeight - margin - rowHeight,
@@ -2598,15 +2282,14 @@ export class PdfService {
       height: rowHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
-      color: rgb(1, 1, 1), // Fondo blanco
+      color: rgb(1, 1, 1),
     });
 
-    // Primera columna: Logo
     let logoBytes = await fetch('/assets/img/logo.png').then((res) =>
-      res.arrayBuffer()
+      res.arrayBuffer(),
     );
     let logoImage = await pdfDoc.embedPng(logoBytes);
-    let logoDims = logoImage.scale(0.1); // Redimensiona el logo si es necesario
+    let logoDims = logoImage.scale(0.1);
     page.drawImage(logoImage, {
       x: margin + 5,
       y: pageHeight - margin - rowHeight + 5,
@@ -2614,26 +2297,24 @@ export class PdfService {
       height: logoDims.height,
     });
 
-    // Segunda columna: Título  (centrado)
-    let titleWidth = verdanaBoldFont.widthOfTextAtSize(titleText, sizeTitle); // Calcula el ancho del texto
-    let titleHeight = verdanaBoldFont.heightAtSize(sizeTitle); // Calcula la altura del texto
-    // Centrar el texto horizontalmente
+    let titleWidth = verdanaBoldFont.widthOfTextAtSize(titleText, sizeTitle);
+    let titleHeight = verdanaBoldFont.heightAtSize(sizeTitle);
+
     let centerX = margin + (pageWidth - 2 * margin - titleWidth) / 2;
 
-    // Dibujar el texto del título
     page.drawText(titleText, {
-      x: centerX, // Posición X centrada
-      y: pageHeight - margin - rowHeight + (rowHeight - titleHeight) / 2, // Centrado en el eje Y
+      x: centerX,
+      y: pageHeight - margin - rowHeight + (rowHeight - titleHeight) / 2,
       size: sizeTitle,
       font: verdanaBoldFont,
       color: rgb(0, 0, 0),
     });
-    // Tercera columna: "FOR-RH-001"
+
     let codeText = 'FOR-RH-001';
     let codeWidth = verdanaFont.widthOfTextAtSize(codeText, 8);
     page.drawText(codeText, {
-      x: margin + 2 * columnWidth + columnWidth - codeWidth - 30, // Alineado a la derecha en la tercera columna
-      y: pageHeight - margin - 15, // Parte superior de la celda
+      x: margin + 2 * columnWidth + columnWidth - codeWidth - 30,
+      y: pageHeight - margin - 15,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
@@ -2642,21 +2323,20 @@ export class PdfService {
     let codeDate = 'FECHA: ' + fechaSolicitud;
     let codeDateWith = verdanaFont.widthOfTextAtSize(codeDate, 8);
     page.drawText(codeDate, {
-      x: margin + 2 * columnWidth + columnWidth - codeDateWith, // Alineado a la derecha en la tercera columna
-      y: pageHeight - margin - 35, // Parte superior de la celda
+      x: margin + 2 * columnWidth + columnWidth - codeDateWith,
+      y: pageHeight - margin - 35,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    /******** DATOS GENERALES ENCABEZADO **********/
     let datosGeneralesRowY = pageHeight - margin - rowHeight - 14.7;
     let datosGeneralesRowWidth = pageWidth - 2 * margin;
 
     page.drawRectangle({
       x: margin,
       y: datosGeneralesRowY,
-      width: datosGeneralesRowWidth, // Usamos el mismo ancho total
+      width: datosGeneralesRowWidth,
       height: cellHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
@@ -2665,7 +2345,7 @@ export class PdfService {
     let datosGeneralesText = 'DATOS GENERALES';
     let datosGeneralesTextWidth = verdanaBoldFont.widthOfTextAtSize(
       datosGeneralesText,
-      9
+      9,
     );
 
     page.drawText(datosGeneralesText, {
@@ -2676,30 +2356,16 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    /********* 1° FILA PARA DATO GENERALES *********/
-    // Crear una nueva fila para los datos generales
     let rowDatosGeneralesY = datosGeneralesRowY - cellHeight;
 
-    // Definimos los anchos personalizados para cada columna (en puntos)
-    let columnWidths = [
-      45, // Nombres
-      110, // Valor de Nombres
-      46, // Apellidos
-      150, // Valor de Apellidos
-      25, // C.I.
-      64, // Valor de C.I.
-      45, // Teléfono
-      53.5, // Valor de Teléfono
-    ];
+    let columnWidths = [45, 110, 46, 150, 25, 64, 45, 53.5];
 
-    // Función para dibujar una celda con texto
     let drawCellWithText = (
       label: string,
       xPos: number,
       yPos: number,
-      cellWidth: number
+      cellWidth: number,
     ) => {
-      // Dibujar la celda con borde
       page.drawRectangle({
         x: xPos,
         y: yPos,
@@ -2709,9 +2375,8 @@ export class PdfService {
         borderWidth: 1,
       });
 
-      // Dibujar el texto centrado verticalmente
       page.drawText(label, {
-        x: xPos + 5, // Margen interno
+        x: xPos + 5,
         y: yPos + (cellHeight - sizeNormal) / 2,
         size: sizeNormal,
         font: verdanaFont,
@@ -2719,12 +2384,10 @@ export class PdfService {
       });
     };
 
-    // Posición X inicial
     let xPos = margin;
 
-    // Dibujar las 8 columnas con sus respectivos anchos personalizados
     drawCellWithText('Nombres:', xPos, rowDatosGeneralesY, columnWidths[0]);
-    xPos += columnWidths[0]; // Avanzar a la siguiente posición de celda
+    xPos += columnWidths[0];
 
     drawCellWithText(nombres, xPos, rowDatosGeneralesY, columnWidths[1]);
     xPos += columnWidths[1];
@@ -2746,18 +2409,10 @@ export class PdfService {
 
     drawCellWithText(telefono, xPos, rowDatosGeneralesY, columnWidths[7]);
 
-    /****************** 2° FILA PARA DATOS GENERALES ***************/
+    let rowCargoY = rowDatosGeneralesY - cellHeight;
 
-    // Definimos la posición Y para la nueva fila
-    let rowCargoY = rowDatosGeneralesY - cellHeight; // Debajo de la fila anterior
+    let columnWidthsCargo = [34, pageWidth - 2 * margin - 34];
 
-    // Definimos los anchos personalizados para las dos columnas
-    let columnWidthsCargo = [
-      34, // Ancho para "Cargo que desempeña:"
-      pageWidth - 2 * margin - 34, // Ancho restante para el valor de `this.cargo`
-    ];
-
-    // Dibujar la primera columna: "Cargo que desempeña:"
     page.drawRectangle({
       x: margin,
       y: rowCargoY,
@@ -2768,14 +2423,13 @@ export class PdfService {
     });
 
     page.drawText('Cargo:', {
-      x: margin + 5, // Margen interno
-      y: rowCargoY + (cellHeight - sizeNormal) / 2, // Centrado verticalmente
+      x: margin + 5,
+      y: rowCargoY + (cellHeight - sizeNormal) / 2,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la segunda columna: valor de `this.cargo`
     page.drawRectangle({
       x: margin + columnWidthsCargo[0],
       y: rowCargoY,
@@ -2786,28 +2440,24 @@ export class PdfService {
     });
 
     page.drawText(this.truncateText(cargo, 139), {
-      x: margin + columnWidthsCargo[0] + 5, // Margen interno en la segunda columna
-      y: rowCargoY + (cellHeight - sizeNormal) / 2, // Centrado verticalmente
+      x: margin + columnWidthsCargo[0] + 5,
+      y: rowCargoY + (cellHeight - sizeNormal) / 2,
       size: sizeMinimun,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    /****************** 3° FILA PARA DATOS GENERALES ***************/
-    // Definimos la posición Y para la nueva fila
-    let rowRegistroY = rowCargoY - cellHeight; // Justo debajo de la fila de "Cargo"
+    let rowRegistroY = rowCargoY - cellHeight;
 
-    // Definimos los anchos personalizados para las seis columnas
     let columnWidthsRegistro = [
-      55, // Ancho para "N° Item:"
-      33, // Ancho para `this.registro`
-      35, // Ancho para "Unidad:"
-      310, // Ancho para `this.unidad`
-      58, // Ancho para "Dependencia:"
-      pageWidth - 2 * margin - 491, // Ancho restante para `this.dependencia`
+      55,
+      33,
+      35,
+      310,
+      58,
+      pageWidth - 2 * margin - 491,
     ];
 
-    // Dibujar la primera columna: "N° Item:"
     page.drawRectangle({
       x: margin,
       y: rowRegistroY,
@@ -2824,7 +2474,6 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la segunda columna: `this.registro`
     page.drawRectangle({
       x: margin + columnWidthsRegistro[0],
       y: rowRegistroY,
@@ -2841,7 +2490,6 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la tercera columna: "Unidad:"
     page.drawRectangle({
       x: margin + columnWidthsRegistro[0] + columnWidthsRegistro[1],
       y: rowRegistroY,
@@ -2858,7 +2506,6 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la cuarta columna: `this.unidad`
     page.drawRectangle({
       x:
         margin +
@@ -2884,7 +2531,6 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la quinta columna: "Dependencia:"
     page.drawRectangle({
       x:
         margin +
@@ -2912,7 +2558,6 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la sexta columna: `this.dependencia`
     page.drawRectangle({
       x:
         margin +
@@ -2942,40 +2587,34 @@ export class PdfService {
       color: rgb(0, 0, 0),
     });
 
-    /****************** FILA PARA DETALLE******************** */
+    let detalleRowY = rowDatosGeneralesY - 45;
 
-    let detalleRowY = rowDatosGeneralesY - 45; // Debajo de la tabla
-    // Ancho total de la fila  (suma de todas las columnas)
     let detalleRowXWidth = pageWidth - 2 * margin;
 
-    // Dibujar la celda de "DETALLE"
     page.drawRectangle({
       x: margin,
       y: detalleRowY,
-      width: detalleRowXWidth, // Usamos el mismo ancho total
+      width: detalleRowXWidth,
       height: cellHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
     });
 
-    // Texto "DETALLE" centrado
     let detalleText = 'DETALLE';
     let detalleTextWidth = verdanaBoldFont.widthOfTextAtSize(detalleText, 9);
 
     page.drawText(detalleText, {
-      x: margin + (detalleRowXWidth - detalleTextWidth) / 2, // Centrado horizontalmente
-      y: detalleRowY + (cellHeight - 9) / 2 + 2, // Centrado verticalmente
+      x: margin + (detalleRowXWidth - detalleTextWidth) / 2,
+      y: detalleRowY + (cellHeight - 9) / 2 + 2,
       size: sizeNormal,
       font: verdanaBoldFont,
       color: rgb(0, 0, 0),
     });
 
-    // Cuarta fila: Encabezado de la tabla (7 columnas)
-    let row4Y = detalleRowY - 15; // Debajo de la fila de Cargo y N° registro
+    let row4Y = detalleRowY - 15;
 
-    let cellWidth = (pageWidth - 2 * margin) / 7; // Ancho dividido entre 7 columnas
+    let cellWidth = (pageWidth - 2 * margin) / 7;
 
-    // Dibujar encabezados de la tabla
     let headers = [
       'Fecha',
       'Jornada',
@@ -2986,19 +2625,18 @@ export class PdfService {
       'Turno',
     ];
     headers.forEach((header, index) => {
-      // Omitir la columna separadora (índice 3)
       if (index === 3) {
-        return; // Salir de esta iteración
+        return;
       }
       let xPos = margin + index * cellWidth;
       page.drawText(header, {
-        x: xPos + 2, // Un poco de margen dentro de la celda
-        y: row4Y + cellHeight - 10, // Ajustar para centrar en la celda
+        x: xPos + 2,
+        y: row4Y + cellHeight - 10,
         size: sizeMinimun,
         font: verdanaBoldFont,
         color: rgb(0, 0, 0),
       });
-      // Dibujar la celda del encabezado
+
       page.drawRectangle({
         x: xPos,
         y: row4Y,
@@ -3009,30 +2647,18 @@ export class PdfService {
       });
     });
 
-    // Dibujar las filas de datos (21 filas en total)
     for (let rowIndex = 0; rowIndex < 20; rowIndex++) {
       let rowY = row4Y - (rowIndex + 1) * cellHeight;
 
       for (let colIndex = 0; colIndex < 7; colIndex++) {
         let xPos = margin + colIndex * cellWidth;
 
-        // Columna separadora (colIndex 3) se mantiene vacía
         if (colIndex === 3) {
-          //   page.drawRectangle({
-          //     x: xPos,
-          //     y: rowY,
-          //     width: cellWidth,
-          //     height: cellHeight,
-          //     borderColor: rgb(0, 0, 0),
-          //     borderWidth: 1,
-          //   });
           continue;
         }
 
-        // Calcular el índice del elemento en `dias` para esta celda
-        let dataIndex = rowIndex + (colIndex < 4 ? 0 : 20); // Cambia a segunda mitad después de la fila 21
+        let dataIndex = rowIndex + (colIndex < 4 ? 0 : 20);
 
-        // Obtener el dato correspondiente
         let dia = dias[dataIndex];
         let text = '';
         if (dia) {
@@ -3040,11 +2666,10 @@ export class PdfService {
             colIndex % 3 === 0
               ? dia.fechaFormateada
               : colIndex % 3 === 1
-              ? dia.jornada
-              : dia.turno;
+                ? dia.jornada
+                : dia.turno;
         }
 
-        // Dibujar el texto
         page.drawText(text || '', {
           x: xPos + 2,
           y: rowY + cellHeight - 10,
@@ -3053,7 +2678,6 @@ export class PdfService {
           color: rgb(0, 0, 0),
         });
 
-        // Dibujar la celda
         page.drawRectangle({
           x: xPos,
           y: rowY,
@@ -3065,134 +2689,70 @@ export class PdfService {
       }
     }
 
-    // Nueva fila para "TOTAL DÍAS SOLICITADOS" y "Saldo Días Vacación al:"
-    let rowTotalDiasY = row4Y - 21 * cellHeight - 5; // Debajo de las 21 filas
+    let rowTotalDiasY = row4Y - 21 * cellHeight - 5;
 
-    // Dibujar la celda combinada para "TOTAL DÍAS SOLICITADOS:"
     page.drawRectangle({
       x: margin,
       y: rowTotalDiasY,
-      width: 3 * cellWidth, // Ancho combinado de las 3 primeras columnas
+      width: 3 * cellWidth,
       height: cellHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
     });
 
-    // Texto "TOTAL DÍAS SOLICITADOS:"
     let totalDiasText = `TOTAL DÍAS SOLICITADOS: `;
     let totalDiasTextWidth = verdanaBoldFont.widthOfTextAtSize(
       totalDiasText,
-      7
+      7,
     );
     page.drawText(totalDiasText, {
-      x: margin + (3 * cellWidth - totalDiasTextWidth) / 2 - 10, // Centrado
-      y: rowTotalDiasY + (cellHeight - 6) / 2, // Centrado verticalmente
-      size: sizeNormal,
-      font: verdanaBoldFont,
-      color: rgb(0, 0, 0),
-    });
-    // Texto del valor de `total_dias`
-    let totalDiasValue = `${dias_solicitados}`;
-    page.drawText(totalDiasValue, {
-      x: margin + 3 * cellWidth - totalDiasTextWidth + 40, // Alineado con separación
+      x: margin + (3 * cellWidth - totalDiasTextWidth) / 2 - 10,
       y: rowTotalDiasY + (cellHeight - 6) / 2,
       size: sizeNormal,
       font: verdanaBoldFont,
       color: rgb(0, 0, 0),
     });
-    /********************************************************************************** */
 
-    // let detalleRowY = rowDatosGeneralesY - 45; // Debajo de la tabla
-    // // Ancho total de la fila  (suma de todas las columnas)
-    // let detalleRowXWidth = pageWidth - 2 * margin;
+    let totalDiasValue = `${dias_solicitados}`;
+    page.drawText(totalDiasValue, {
+      x: margin + 3 * cellWidth - totalDiasTextWidth + 40,
+      y: rowTotalDiasY + (cellHeight - 6) / 2,
+      size: sizeNormal,
+      font: verdanaBoldFont,
+      color: rgb(0, 0, 0),
+    });
 
-    // // Dibujar la celda de "DETALLE"
-    // page.drawRectangle({
-    //   x: margin,
-    //   y: detalleRowY,
-    //   width: detalleRowXWidth, // Usamos el mismo ancho total
-    //   height: cellHeight,
-    //   borderColor: rgb(0, 0, 0),
-    //   borderWidth: 1,
-    // });
-
-    // // Texto "DETALLE" centrado
-    // let detalleText = 'SALIDA';
-    // let detalleTextWidth = verdanaBoldFont.widthOfTextAtSize(detalleText, 9);
-
-    // page.drawText(detalleText, {
-    //   x: margin + (detalleRowXWidth - detalleTextWidth) / 2, // Centrado horizontalmente
-    //   y: detalleRowY + (cellHeight - 9) / 2 + 2, // Centrado verticalmente
-    //   size: sizeNormal,
-    //   font: verdanaBoldFont,
-    //   color: rgb(0, 0, 0),
-    // });
-
-    // // Cuarta fila: Encabezado de la tabla (7 columnas)
-    // let row4Y = detalleRowY - 15; // Debajo de la fila de Cargo y N° registro
-
-    // let cellWidth = (pageWidth - 2 * margin) / 7; // Ancho dividido entre 7 columnas
-
-    // // Nueva fila para "TOTAL DÍAS SOLICITADOS" y "Saldo Días Vacación al:"
-    // let rowTotalDiasY = row4Y - 21; // Debajo de las 21 filas
-
-    // // Dibujar la celda combinada para "SELLO"
-    // page.drawRectangle({
-    //   x: margin,
-    //   y: rowTotalDiasY - 76,
-    //   width: 3 * cellWidth, // Ancho combinado de las 3 primeras columnas
-    //   height: cellHeight * 7 + 3,
-    //   borderColor: rgb(0, 0, 0),
-    //   borderWidth: 1,
-    // });
-
-    // // Texto "SELLO DEL LUGAR VISITADO "
-    // let totalDiasText = `SELLO DEL LUGAR VISITADO`;
-    // let totalDiasTextWidth = verdanaFont.widthOfTextAtSize(totalDiasText, 7);
-    // page.drawText(totalDiasText, {
-    //   x: margin + cellWidth - 4, // Centrado
-    //   y: rowTotalDiasY - 20, // Centrado verticalmente
-    //   size: sizeMinimun,
-    //   font: verdanaFont,
-    //   color: rgb(0, 0, 0),
-    // });
-
-    // Fila 1: Solo se dibuja la columna 7
-    let rowSaldoY = rowTotalDiasY - cellHeight - 19; // Justo debajo de la fila anterior
+    let rowSaldoY = rowTotalDiasY - cellHeight - 19;
     let xMotivo = margin;
     let withMotivo = 7 * cellWidth - 3;
     page.drawRectangle({
-      x: xMotivo, // Posición de la columna 7
+      x: xMotivo,
       y: rowSaldoY + 17.5 - 3,
-      width: withMotivo, // Ancho de la celda
-      height: cellHeight, // Altura de la celda
+      width: withMotivo,
+      height: cellHeight,
       borderColor: rgb(0, 0, 0),
       borderWidth: 1,
     });
 
-    // Texto "Saldo Días Vacación al:" en la columna 7
     let saldoDiasText_2 = `Motivo`;
 
     page.drawText(saldoDiasText_2, {
-      x: margin + 3 * cellWidth + 30, // Espaciado dentro de la celda
-      y: rowSaldoY + 19, // Centrado verticalmente
+      x: margin + 3 * cellWidth + 30,
+      y: rowSaldoY + 19,
       size: sizeNormal,
       font: verdanaFont,
       color: rgb(0, 0, 0),
     });
 
-    // Fila 2: Solo se dibuja la columna 7
-    let rowTotalVacacionY = rowSaldoY - cellHeight; // Justo debajo de la fila anterior
+    let rowTotalVacacionY = rowSaldoY - cellHeight;
 
-    // Parámetros del rectángulo
-    let rectX = xMotivo; // Posición X
-    let rectY = rowTotalVacacionY - 46.5; // Posición Y
-    let rectWidth = withMotivo; // Ancho del rectángulo
-    let rectHeight = cellHeight * 4 + 16; // Altura del rectángulo
-    let lineHeight = 10; // Altura de cada línea de texto
-    let padding = 5; // Espaciado dentro del rectángulo
+    let rectX = xMotivo;
+    let rectY = rowTotalVacacionY - 46.5;
+    let rectWidth = withMotivo;
+    let rectHeight = cellHeight * 4 + 16;
+    let lineHeight = 10;
+    let padding = 5;
 
-    // Dibujar el rectángulo
     page.drawRectangle({
       x: rectX,
       y: rectY,
@@ -3202,7 +2762,6 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Dividir el texto en líneas
     let textLines: string[] = [];
     let remainingText = detalle;
 
@@ -3218,8 +2777,7 @@ export class PdfService {
       remainingText = remainingText.slice(i);
     }
 
-    // Dibujar las líneas de texto
-    let currentY = rectY + rectHeight - lineHeight - padding; // Coordenada Y inicial
+    let currentY = rectY + rectHeight - lineHeight - padding;
     textLines.forEach((line) => {
       if (currentY > rectY + padding) {
         page.drawText(line, {
@@ -3229,35 +2787,24 @@ export class PdfService {
           font: verdanaFont,
           color: rgb(0, 0, 0),
         });
-        currentY -= lineHeight; // Moverse a la siguiente línea
+        currentY -= lineHeight;
       }
     });
 
-    /************* FILA "DETALLE DE PERSONAL DE REEMPLAZO"******** */
-    let detalleReemplazoRowY = rowTotalVacacionY - 22; // Debajo de la tabla
-    // Ancho total de la fila  (suma de todas las columnas)
+    let detalleReemplazoRowY = rowTotalVacacionY - 22;
+
     let detalleRowWidth = pageWidth - 2 * margin;
 
-    /********** 1° FILA "DETALLE DE PERSONAL DE REEMPLAZO"**********/
     let rowReemplazoY = detalleReemplazoRowY - cellHeight;
 
-    /*********** 2° FILA "DETALLE DE PERSONAL DE REEMPLAZO"*******/
+    let rowCargoDetalleY = rowReemplazoY - cellHeight;
 
-    // Definimos la posición Y para la nueva fila
-    let rowCargoDetalleY = rowReemplazoY - cellHeight; // Debajo de la fila anterior
+    let columnWidthsCargoDetalle = [34, pageWidth - 2 * margin - 34];
 
-    // Definimos los anchos personalizados para las dos columnas
-    let columnWidthsCargoDetalle = [
-      34, // Ancho para "Cargo que desempeña:"
-      pageWidth - 2 * margin - 34, // Ancho restante para el valor de `this.cargo`
-    ];
-
-    /********** FILA PARA SOLICITANTE Y JEFE ********** */
     let rowFirmasY = rowCargoDetalleY - cellHeight;
-    // Ancho de cada columna (dividido en tres partes iguales)
+
     let firmaColumnWidth = detalleRowWidth / 3;
 
-    // Dibujar la celda para "Solicitante"
     page.drawRectangle({
       x: margin,
       y: rowFirmasY,
@@ -3267,21 +2814,19 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Texto "Solicitante" centrado
     let solicitanteText = 'Solicitante';
     let solicitanteTextWidth = verdanaBoldFont.widthOfTextAtSize(
       solicitanteText,
-      9
+      9,
     );
     page.drawText(solicitanteText, {
-      x: margin + (firmaColumnWidth - solicitanteTextWidth) / 2 + 5, // Centrado horizontalmente
-      y: rowFirmasY + (cellHeight - 9) / 2 + 2, // Centrado verticalmente
+      x: margin + (firmaColumnWidth - solicitanteTextWidth) / 2 + 5,
+      y: rowFirmasY + (cellHeight - 9) / 2 + 2,
       size: sizeNormal,
       font: verdanaBoldFont,
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la celda para "Jefe Inmediato Superior"
     page.drawRectangle({
       x: margin + firmaColumnWidth,
       y: rowFirmasY,
@@ -3291,19 +2836,17 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Texto "Jefe Inmediato Superior" centrado
     let jefeText = 'Inmediato Superior';
     let jefeTextWidth = verdanaBoldFont.widthOfTextAtSize(jefeText, 9);
     page.drawText(jefeText, {
       x:
-        margin + firmaColumnWidth + (firmaColumnWidth - jefeTextWidth) / 2 + 10, // Centrado horizontalmente
-      y: rowFirmasY + (cellHeight - 9) / 2 + 2, // Centrado verticalmente
+        margin + firmaColumnWidth + (firmaColumnWidth - jefeTextWidth) / 2 + 10,
+      y: rowFirmasY + (cellHeight - 9) / 2 + 2,
       size: sizeNormal,
       font: verdanaBoldFont,
       color: rgb(0, 0, 0),
     });
 
-    // Dibujar la celda para "Dirección Adm. y RRHH"
     page.drawRectangle({
       x: margin + 2 * firmaColumnWidth,
       y: rowFirmasY,
@@ -3313,28 +2856,25 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Texto "Dirección Adm. y RRHH" centrado
     let direccionText = 'Dirección Adm. y RRHH';
     let direccionTextWidth = verdanaBoldFont.widthOfTextAtSize(
       direccionText,
-      9
+      9,
     );
     page.drawText(direccionText, {
       x:
         margin +
         2 * firmaColumnWidth +
         (firmaColumnWidth - direccionTextWidth) / 2 +
-        10, // Centrado horizontalmente
-      y: rowFirmasY + (cellHeight - 9) / 2 + 2, // Centrado verticalmente
+        10,
+      y: rowFirmasY + (cellHeight - 9) / 2 + 2,
       size: sizeNormal,
       font: verdanaBoldFont,
       color: rgb(0, 0, 0),
     });
 
-    // Fila vacía debajo de las tres columnas
-    let rowNuevaFilaY = rowFirmasY - cellHeight - 70; // Justo debajo de la fila anterior
+    let rowNuevaFilaY = rowFirmasY - cellHeight - 70;
 
-    // Dibujar la celda vacía para la primera columna
     page.drawRectangle({
       x: margin,
       y: rowNuevaFilaY,
@@ -3344,7 +2884,6 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Dibujar la celda vacía para la segunda columna
     page.drawRectangle({
       x: margin + firmaColumnWidth,
       y: rowNuevaFilaY,
@@ -3354,7 +2893,6 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Dibujar la celda vacía para la tercera columna
     page.drawRectangle({
       x: margin + 2 * firmaColumnWidth,
       y: rowNuevaFilaY,
@@ -3364,7 +2902,6 @@ export class PdfService {
       borderWidth: 1,
     });
 
-    // Guardamos el PDF
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
     saveAs(blob, 'solicitud_de_permiso.pdf');
@@ -3382,7 +2919,7 @@ export class PdfService {
     }
 
     const dia = fechaConvertida.getUTCDate().toString().padStart(2, '0');
-    const mes = (fechaConvertida.getUTCMonth() + 1).toString().padStart(2, '0'); // Los meses comienzan desde 0
+    const mes = (fechaConvertida.getUTCMonth() + 1).toString().padStart(2, '0');
     const anio = fechaConvertida.getUTCFullYear();
 
     return `${dia}/${mes}/${anio}`;

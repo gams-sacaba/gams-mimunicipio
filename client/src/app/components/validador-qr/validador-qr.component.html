@@ -1,0 +1,87 @@
+<div class="validator-wrapper">
+    <div class="validator-card" [class.is-loading]="isLoading">
+
+        <!-- HEADER -->
+        <div class="header">
+            <div class="logo-container">
+                <img src="assets/img/logo.png" alt="Gobierno Autónomo Municipal de SACABA"
+                    onerror="this.src='assets/img/logo-dark.png'">
+            </div>
+            <h2>Sistema de Validación Documental</h2>
+        </div>
+
+        <!-- BODY -->
+        <div class="card-body">
+
+            <!-- LOADING STATE -->
+            <div *ngIf="isLoading" class="state-container loading-state">
+                <div class="spinner"></div>
+                <p>Validando código de seguridad...</p>
+            </div>
+
+            <!-- SUCCESS STATE -->
+            <div *ngIf="!isLoading && isValid" class="state-container success-state">
+                <div class="icon-circle success">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h3 class="status-title">Documento Auténtico</h3>
+                <p class="status-subtitle">La información escaneada coincide con nuestros registros oficiales.</p>
+
+                <div class="data-group">
+                    <div class="data-item">
+                        <span class="label">Fecha de Verificación</span>
+                        <span class="value highlight">{{ fechaVerificacion | date:'dd/MM/yyyy HH:mm:ss' }}</span>
+                    </div>
+
+                    <div class="data-item" *ngIf="recursoData?.nombre">
+                        <span class="label">Documento</span>
+                        <span class="value">{{ recursoData.nombre }}</span>
+                    </div>
+
+                    <div class="data-item" *ngIf="qrData?.tipo">
+                        <span class="label">Tipo de Emisión</span>
+                        <span class="value badge">{{ qrData.tipo }}</span>
+                    </div>
+                </div>
+
+                <!-- INFORMACIÓN LEGAL -->
+                <div class="legal-info-container" *ngIf="infoLegal?.length">
+                    <h4>Información de Respaldo</h4>
+                    <ul class="legal-list">
+                        <li *ngFor="let info of infoLegal">
+                            <i class="fas fa-chevron-right list-icon"></i>
+                            <span>{{ info }}</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- BUTTON TO VIEW FILE IF POSSIBLE -->
+                <div class="action-buttons" *ngIf="recursoData?.url_destino">
+                    <!-- We don't have the full environment URL directly here easily without adding it, but we can emit a warning or show a mock button -->
+                    <button class="btn-primary" onclick="alert('Funcionalidad de descarga en desarrollo')">
+                        <i class="fas fa-download"></i> Descargar Documento
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- ERROR STATE -->
+            <div *ngIf="!isLoading && !isValid" class="state-container error-state">
+                <div class="icon-circle error">
+                    <i class="fas fa-times"></i>
+                </div>
+                <h3 class="status-title">Código Inválido</h3>
+                <p class="status-subtitle error-text">{{ errorMessage | titlecase }}</p>
+                <p class="help-text">El código QR escaneado no existe, ha caducado o el documento ha sido revocado. Por
+                    favor, contacte con la institución si considera que esto es un error.</p>
+            </div>
+
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p>Gobierno Autónomo Municipal de SACABA</p>
+            <p class="small">Plataforma Tecnológica de Transparencia</p>
+        </div>
+    </div>
+</div>

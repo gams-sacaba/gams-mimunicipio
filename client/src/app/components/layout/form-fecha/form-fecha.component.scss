@@ -14,7 +14,7 @@
 }
 
 .titulo-solicitud {
-  display: inline-flex; /* inline-flex mantiene el bloque centrado */
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
@@ -23,7 +23,7 @@
 }
 
 .icon-time {
-  flex-shrink: 0; /* El icono nunca se reduce */
+  flex-shrink: 0;
 }
 
 .info-text {
@@ -120,10 +120,6 @@
 
 .day.header {
   background: #ffffff;
-  //   color: #e91c0d;
-  //   text-transform: uppercase;
-  //   font-weight: 500;
-  //   letter-spacing: 1px;
 }
 
 .day.selected-full {

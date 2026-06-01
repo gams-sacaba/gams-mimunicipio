@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { conexion } from '../../environments/environment.prod';
+import { conexion } from '../../environments/environment';
 
 const base_url = conexion.server.base_url + '/request';
 
@@ -31,8 +31,8 @@ export class SolicitudesService {
           }
 
           // console.error('Error al obtener elementos:', err);
-          return of([]); // Devuelve un array vacío o cualquier valor por defecto si ocurre un error
-        })
+          return of([]);
+        }),
       );
   }
 

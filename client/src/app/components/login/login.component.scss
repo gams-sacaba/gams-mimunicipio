@@ -1,6 +1,5 @@
 $assets-path: "/assets/";
 
-/* Estilos generales */
 .login-section {
   display: flex;
   justify-content: center;
@@ -18,9 +17,13 @@ $assets-path: "/assets/";
   background-color: #fff;
   border-radius: 8px;
   padding: 24px;
-  box-shadow: rgba(0, 0, 0, 0.07) 0px 1px 2px, rgba(0, 0, 0, 0.07) 0px 2px 4px,
-    rgba(0, 0, 0, 0.07) 0px 4px 8px, rgba(0, 0, 0, 0.07) 0px 8px 16px,
-    rgba(0, 0, 0, 0.07) 0px 16px 32px, rgba(0, 0, 0, 0.07) 0px 32px 64px;
+  box-shadow:
+    rgba(0, 0, 0, 0.07) 0px 1px 2px,
+    rgba(0, 0, 0, 0.07) 0px 2px 4px,
+    rgba(0, 0, 0, 0.07) 0px 4px 8px,
+    rgba(0, 0, 0, 0.07) 0px 8px 16px,
+    rgba(0, 0, 0, 0.07) 0px 16px 32px,
+    rgba(0, 0, 0, 0.07) 0px 32px 64px;
   overflow: hidden;
   display: flex;
   flex-direction: row;
@@ -84,51 +87,42 @@ $assets-path: "/assets/";
 
 .custom-input {
   width: 100%;
-  color: rgb(
-    34,
-    34,
-    34
-  ) !important; /* Set the text color to black for readability */
-  border: 1px solid #ccc; /* Optional: Add a subtle border */
+  color: rgb(34, 34, 34) !important;
+  border: 1px solid #ccc;
   margin: 0;
-  padding: 8px; /* Add padding for better appearance */
-  border-radius: 4px; /* Optional: Add rounded corners */
-  box-sizing: border-box; /* Ensure padding and border do not affect overall width */
+  padding: 8px;
+  border-radius: 4px;
+  box-sizing: border-box;
 }
 
-/* Optional: Style for when the input is focused */
 .custom-input:focus {
-  border-color: #1a1a1b !important; /* Change border color when focused */
+  border-color: #1a1a1b !important;
   color: black;
-  outline: none; /* Remove default outline */
-  box-shadow: 0 0 5px rgba(63, 81, 181, 0.5); /* Add a subtle shadow for focus */
+  outline: none;
+  box-shadow: 0 0 5px rgba(63, 81, 181, 0.5);
 }
 
-/*Verificas si funciona ng-deep*/
 ::ng-deep .mat-form-field input {
-  font-size: 18px; /* Ajusta el tamaño según prefieras */
+  font-size: 18px;
 }
 
 .custom-button {
   height: 50px;
   border: 1px solid rgb(218, 216, 216);
-  background-color: white !important; /* Set the background color to white */
-  color: rgb(5, 100, 163) !important; /* Set the text color to white */
+  background-color: white !important;
+  color: rgb(5, 100, 163) !important;
   letter-spacing: 1px;
-  border-radius: 20px; /* Add border radius for rounded corners */
+  border-radius: 20px;
   font-size: 18px;
-  padding: 10px 20px; /* Add padding for better size */
-  transition: background-color 0.3s, color 0.3s; /* Add transitions for smooth effects */
+  padding: 10px 20px;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
 }
 
-/* Optional: Hover effect to improve interaction */
 .custom-button:hover {
-  background-color: rgb(
-    5,
-    100,
-    163
-  ) !important; /* Change background on hover */
-  color: white !important; /* Ensure text color remains white on hover */
+  background-color: rgb(5, 100, 163) !important;
+  color: white !important;
 }
 
 button[mat-raised-button] {
@@ -153,7 +147,6 @@ button[mat-raised-button] {
   text-align: center;
 }
 
-/* Responsivo para pantallas pequeñas */
 @media (max-width: 768px) {
   .login-section {
     height: auto;
@@ -175,7 +168,7 @@ button[mat-raised-button] {
   }
 
   .logo-img {
-    height: 200px; /* Reducimos el tamaño del logo en móviles */
+    height: 200px;
     width: auto;
   }
 

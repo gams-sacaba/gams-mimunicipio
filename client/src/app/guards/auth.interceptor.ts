@@ -1,4 +1,3 @@
-//auth.inteceptor.ts
 import {
   HttpInterceptor,
   HttpRequest,
@@ -30,7 +29,7 @@ export class AuthInterceptor implements HttpInterceptor {
           this.authService.logout();
         }
         return throwError(() => error);
-      })
+      }),
     );
   }
 }

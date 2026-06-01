@@ -5,10 +5,11 @@ import { AuthGuard } from './guards/auth.guard';
 
 import { HomeComponent } from './components/home/home.component';
 import { LoginComponent } from './components/login/login.component';
-// import { OrganigramaComponent } from './components/pages/organigrama/organigrama.component';
+import { ValidadorQrComponent } from './components/validador-qr/validador-qr.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
+  { path: 'validar/:codigoHash', component: ValidadorQrComponent },
   {
     path: '',
     component: HomeComponent,
@@ -17,15 +18,13 @@ const routes: Routes = [
         path: '',
         loadChildren: () =>
           import(`./components/page-routing.module`).then(
-            (m) => m.PageRoutingModule
+            (m) => m.PageRoutingModule,
           ),
       },
     ],
     canActivate: [AuthGuard],
     data: { roles: ['root', 'user', 'visitor'] },
   },
-  //   { path: 'organigrama', component: OrganigramaComponent },
-  // Redirigir a home por defecto
   { path: '**', redirectTo: '' },
 ];
 

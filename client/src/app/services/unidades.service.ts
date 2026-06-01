@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { conexion } from '../../environments/environment.prod';
+import { conexion } from '../../environments/environment';
 
 const base_url = conexion.server.base_url + '/unit';
 

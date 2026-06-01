@@ -1,0 +1,138 @@
+<div class="p-3 p-lg-4" style="overflow-x: hidden;">
+    <!-- Header y Buscador -->
+    <div class="row mb-5 align-items-center header-resources">
+        <div class="col-lg-6">
+            <h2 class="mb-0 TitleRes text-primary d-flex align-items-center">
+                <mat-icon class="me-2 text-primary icon-title"
+                    style="font-size: 35px; width: 35px; height: 35px;">folder_shared</mat-icon>
+                Recursos Compartidos
+            </h2>
+            <p class="text-muted mb-0 mt-1">Archivos, formularios y documentos institucionales a su disposición.
+            </p>
+        </div>
+        <div class="col-lg-6 mt-4 mt-lg-0 d-flex justify-content-lg-end">
+            <mat-form-field appearance="outline" class="search-field w-100 w-lg-75">
+                <mat-label>Buscar recursos...</mat-label>
+                <input matInput (keyup)="onSearchChange($event)" placeholder="Ej. Manual, Resolución...">
+                <mat-icon matSuffix class="text-muted">search</mat-icon>
+            </mat-form-field>
+        </div>
+    </div>
+
+    <!-- Filtros de Categorías estilo TABS -->
+    <div class="row mb-4">
+        <div class="col-12 px-3 d-flex align-items-center">
+
+            <!-- Botón Izquierdo -->
+            <button *ngIf="showScrollButtons" mat-icon-button (click)="scrollCategories(-200)"
+                class="scroll-btn shadow-sm me-2">
+                <mat-icon style="line-height: inherit;">chevron_left</mat-icon>
+            </button>
+
+            <!-- Contenedor -->
+            <div class="category-tabs d-flex border-bottom overflow-auto flex-grow-1" #tabsContainer>
+                <div *ngFor="let cat of categories"
+                    class="category-tab px-3 py-2 flex-shrink-0 cursor-pointer position-relative text-nowrap"
+                    [class.active]="selectedCategory === cat" (click)="setCategory(cat)">
+                    {{ cat }}
+                </div>
+            </div>
+
+            <!-- Botón Derecho -->
+            <button *ngIf="showScrollButtons" mat-icon-button (click)="scrollCategories(200)"
+                class="scroll-btn shadow-sm ms-2">
+                <mat-icon style="line-height: inherit;">chevron_right</mat-icon>
+            </button>
+
+        </div>
+    </div>
+
+    <!-- Indicador de Carga -->
+    <div *ngIf="loading" class="text-center my-5 py-5 text-muted">
+        <mat-spinner diameter="40" class="mx-auto mb-3"></mat-spinner>
+        <p>Cargando recursos...</p>
+    </div>
+
+    <!-- Estado Vacío -->
+    <div *ngIf="!loading && filteredRecursos.length === 0" class="text-center my-5 py-5 text-muted empty-state">
+        <mat-icon class="empty-icon mb-3">folder_open</mat-icon>
+        <h4 class="mb-1 text-primary">No hay recursos disponibles</h4>
+        <p>No encontramos archivos publicados que correspondan a tu perfil o tu búsqueda.</p>
+    </div>
+
+    <!-- Lista Moderna de Recursos -->
+    <div class="row" *ngIf="!loading && filteredRecursos.length > 0">
+        <div class="col-12">
+            <div class="list-group modern-list">
+                <div *ngFor="let item of filteredRecursos"
+                    class="list-group-item modern-list-item d-flex flex-column flex-md-row align-items-md-center py-4 px-4 bg-white mb-3 animate__animated animate__fadeInUp">
+
+                    <!-- Icono Archivo -->
+                    <div class="file-icon-box me-md-4 mb-3 mb-md-0">
+                        <mat-icon class="file-icon">{{getFileIcon(item.archivo?.extension,
+                            item.archivo?.mimetype)}}</mat-icon>
+                    </div>
+
+                    <!-- Detalles -->
+                    <div class="flex-grow-1">
+                        <h5 class="mb-1 fw-bold text-dark resource-title">{{item.titulo}}</h5>
+                        <p class="mb-2 text-muted small resource-desc">{{item.descripcion || 'Sin descripción
+                            adicional.'}}</p>
+
+                        <div class="d-flex flex-wrap gap-2 text-secondary small align-items-center badges-row">
+                            <span class="badge badge-light-primary text-primary px-2 py-1 rounded-pill fw-normal">
+                                <mat-icon class="align-middle me-1"
+                                    style="font-size: 14px; width: 14px; height: 14px;">category</mat-icon>
+                                {{item.tipoDocumento}}
+                            </span>
+                            <span class="badge badge-light-secondary text-secondary px-2 py-1 rounded-pill fw-normal"
+                                *ngIf="item.archivo?.tamano">
+                                <mat-icon class="align-middle me-1"
+                                    style="font-size: 14px; width: 14px; height: 14px;">sd_storage</mat-icon>
+                                {{(item.archivo.tamano / 1024 / 1024) | number:'1.2-2'}} MB
+                            </span>
+                            <span class="badge badge-light-secondary text-secondary px-2 py-1 rounded-pill fw-normal">
+                                <mat-icon class="align-middle me-1"
+                                    style="font-size: 14px; width: 14px; height: 14px;">event</mat-icon>
+                                {{item.metadata?.fechaPublicacion | date:'dd/MM/yyyy'}}
+                            </span>
+                            <span class="badge badge-light-secondary text-danger px-2 py-1 rounded-pill fw-normal"
+                                *ngIf="item.metadata?.fechaExpiracion">
+                                <mat-icon class="align-middle me-1"
+                                    style="font-size: 14px; width: 14px; height: 14px;">event_busy</mat-icon> Vence:
+                                {{item.metadata?.fechaExpiracion | date:'dd/MM/yyyy'}}
+                            </span>
+                            <span class="badge badge-light-info text-info px-2 py-1 rounded-pill fw-normal"
+                                *ngIf="item.metadata?.descargas !== undefined">
+                                <mat-icon class="align-middle me-1"
+                                    style="font-size: 14px; width: 14px; height: 14px;">{{ item?.formato ===
+                                    'URL' ? 'visibility' : 'download' }}</mat-icon>
+                                {{ item.metadata?.descargas }}
+                                {{ item?.formato === 'URL' ? 'vistas' : 'descargas' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Acciones -->
+                    <div
+                        class="ms-md-4 mt-3 mt-md-0 text-md-end text-center d-flex flex-row flex-md-column justify-content-center gap-2">
+
+                        <button *ngIf="item.formato !== 'URL'" mat-flat-button color="primary"
+                            class="download-btn w-100 rounded-pill px-4" (click)="download(item)">
+                            <mat-icon>cloud_download</mat-icon>
+                            Descargar
+                        </button>
+
+                        <button *ngIf="item.formato === 'URL'" mat-flat-button color="primary"
+                            class="download-btn w-100 rounded-pill px-4" (click)="download(item)">
+                            <mat-icon>launch</mat-icon> <!-- Ícono de ventana externa -->
+                            Abrir Enlace
+                        </button>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

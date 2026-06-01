@@ -1,4 +1,9 @@
-export const server = {
+export const conexion = {
   production: false,
-  base_url: '',
+  server: {
+    base_url: 'http://10.0.38.77:3330',
+  },
+  socket: {
+    base_url: 'http://10.0.38.77:3330',
+  },
 };
